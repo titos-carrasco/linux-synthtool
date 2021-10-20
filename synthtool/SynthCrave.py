@@ -23,10 +23,19 @@ class SynthCrave():
         self.builder = Gtk.Builder()
         self.builder.add_from_file( filedef )
 
+        # Main Window
         self.mainWindow = self.builder.get_object( "Main Window" )
         self.mainWindow.connect( "destroy", self.onWindowDestroy )
         self.builder.get_object( "Main Exit" ).connect( "clicked", self.onExitClicked )
 
+        self.statusBar = self.builder.get_object( "Status Bar" )
+
+        # Error Window
+        self.errorWindow = self.builder.get_object( "Error Mindow" )
+        self.errorWindow.connect( "destroy", self.onWindowDestroy )
+        self.builder.get_object( "Error Exit" ).connect( "clicked", self.onExitClicked )
+
+        # Tab General
         self.pitchBend = self.builder.get_object( "Pitch Bend" )
         self.clockSource = self.builder.get_object( "Clock Source")
         self.clockType = self.builder.get_object( "Clock Type" )
@@ -47,11 +56,9 @@ class SynthCrave():
         self.accentVelocityTreshold.connect( "value-changed", self.setSpinButton, [ 0x1C, 0x00 ] )
         self.factorySettings.connect( "clicked", self.onFactorySettingClicked )
 
-        self.errorWindow = self.builder.get_object( "Error Mindow" )
-        self.errorWindow.connect( "destroy", self.onWindowDestroy )
-        self.builder.get_object( "Error Exit" ).connect( "clicked", self.onExitClicked )
-
-        self.statusBar = self.builder.get_object( "Status Bar" )
+        # Tab Sequencer
+        self.seqRecall = self.builder.get_object( "SeqRecall" )
+        self.seqRecall.connect( "clicked", self.onSeqRecallClicked )
 
     def onWindowDestroy( self, *args ):
         self.midiIn.close_port()
@@ -63,12 +70,12 @@ class SynthCrave():
 
     def sendSysEx( self, sysex ):
         msg = [ 0xF0 ] + self.MANU_ID + self.DEVICE_ID + sysex + [ 0xF7 ]
-        print( "SendSysEx:", bytes(msg).hex().upper() )
+        #print( "SendSysEx:", bytes(msg).hex().upper() )
         self.midiOut.send_message( msg )
 
     def midiCallback( self, msg, data=None ):
         data = bytes( msg[0] )
-        print( "MidiCallBack RC:", data.hex().upper() )
+        #print( "MidiCallBack RC:", data.hex().upper() )
 
         start = data[:7]
         resp  = data[7:-1]
@@ -77,10 +84,13 @@ class SynthCrave():
         if( start.hex().upper() != bytes( [ 0xF0 ] + self.MANU_ID + self.DEVICE_ID ).hex().upper() ): return
         if( len( resp ) == 0 ): return
         if( end != 0xF7 ): return
-        print( "MidiCallBack OK:", resp.hex().upper() )
 
         if( resp[0] == 0x76 ):
             GLib.idle_add( self.showParameters, resp[1:] )
+        elif( resp[0] == 0x78 ):
+            GLib.idle_add( self.showSequencer, resp[1:] )
+        else:
+            print( "MidiCallBack OK:", resp.hex().upper() )
 
     def showParameters( self, data ):
         self.fromDevice = True
@@ -118,7 +128,7 @@ class SynthCrave():
         self.theWindow.show_all()
         Gtk.main()
 
-    #--
+    # Tab general
     def setStatusBar( self, msg ):
         self.statusBar.set_text( msg )
 
@@ -135,6 +145,45 @@ class SynthCrave():
     def onFactorySettingClicked( self, widget, data=None ):
         self.sendSysEx( [ 0x7D ] )
         self.sendSysEx( [ 0x75 ] )
+
+    # Tab Sequencer
+    def onSeqRecallClicked( self, widget, data=None ):
+        bank = int( self.builder.get_object( "Bank" ).get_value() )
+        patt = int( self.builder.get_object( "Pattern" ).get_value() )
+        self.sendSysEx( [ 0x77, bank-1, patt-1 ] )
+
+    GATES = [ "12,5%", "25.0%", "37.5%", "50.0%", "62.5%", "75.0%", "87.5%", "100%" ]
+    NOTES = [ "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" ]
+
+    def showSequencer( self, data ):
+        bank   = int( data[0] ) + 1
+        patt   = int( data[1] ) + 1
+        swing  = data[2:4]
+        if( swing[0] == 0 ): swing = 50 + int( swing[1] )
+        else: swing = 66 + int( swing[1] )
+        print( "Bank: %d, Pattern: %d, Swing: %d%%" % ( bank, patt, swing ) )
+
+        steps  = data[8:]
+        for i in range(32):
+            step = steps[0:8]
+            if( step[-1] == 0x0F ): break
+
+            n = step[0:2]
+            n = int( n[1] ) + int( n[0] )*16 + 1
+            octave = int( n/12 ) - 1
+            note = self.NOTES[ n%12 - 1]
+            gate = self.GATES[ int(step[2]) ]
+            ratchet = int( step[3] ) + 1
+            n = step[4:6]
+            velocity = int( n[1] ) + int( n[0] )*16
+            glide = 1 if( step[6] & 0x00 != 0 ) else 0
+            accent = 1 if( step[6] & 0x004 != 0 ) else 0
+            rest = 1 if( step[6] & 0x08 != 0 ) else 0
+            unk      = step[7]
+            print( "Step %02d: Note: %-2s%2d, Gate Length: %5s, Ratchet: %d, Velocity: %3d, Glide: %d, Accent: %d, Rest: %d" % ( i, note, octave, gate, ratchet, velocity, glide, accent, rest ) )
+            steps = steps[8:]
+
+
 
 # Show Time
 if( __name__ == "__main__" ):
