@@ -6,70 +6,90 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk,GLib
 
+MAIN_WIN_ID     = "Main Window"
+ERROR_WIN_ID    = "Error Window"
+STATUS_BAR_ID   = "MainWin/Status Bar"
+
+GEN_PITCH_BEND  = "MainWin/General/Pitch Bend"
+GEN_CLOCK_SRC   = "MainWin/General/Clock Source"
+GEN_CLOCK_TYPE  = "MainWin/General/Clock Type"
+GEN_CLOCK_EDGE  = "MainWin/General/Clock Edge"
+GEN_MIDI_CLOCK  = "MainWin/General/Midi Clock Out"
+GEN_ASSIGN_MODE = "MainWin/General/Assign Mode"
+GEN_AUTO_PLAY   = "MainWin/General/Sequencer Auto Play"
+GEN_ACC_VEL_THR = "MainWin/General/Accent Velocity Threshold"
+
+SEQ_BANK        = "MainWin/Sequencer/Bank"
+SEQ_PATTERN     = "MainWin/Sequencer/Pattern"
+SEQ_CLEAR       = "MainWin/Sequencer/Clear"
+SEQ_RECALL      = "MainWin/Sequencer/Recall"
+SEQ_STORE       = "MainWin/Sequencer/Store"
+SEQ_LENGTH      = "MainWin/Sequencer/Length"
+SEQ_SWING       = "MainWin/Sequencer/Swing"
+
+SEQ_NOTES_TREE    = "MainWin/Sequencer/Notes"
+SEQ_NOTES_STORE   = "ListStore MainWin/Sequencer/Notes"
+
+DEVICE_NAME     = "CRAVE MIDI"
+MANUF_ID        = [ 0x00, 0x20, 0x32 ]  # Behringer GmbH
+DEVICE_ID       = [ 0x00, 0x01, 0x05 ]  # CRAVE
+
+GATES = [ "12.5%", "25.0%", "37.5%", "50.0%", "62.5%", "75.0%", "87.5%", "100%" ]
+NOTES = [ "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" ]
+
 
 class SynthCrave():
-    MANU_ID         = [ 0x00, 0x20, 0x32 ]  # Behringer GmbH
-    DEVICE_ID       = [ 0x00, 0x01, 0x05 ]  # CRAVE
-    DEVICE_NAME     = "CRAVE MIDI"
 
     def __init__( self, filedef ):
-        self.midiName = None
         self.fromDevice = False
+
         self.midiIn = rtmidi.MidiIn()
         self.midiIn.ignore_types( sysex=False )
         self.midiOut = rtmidi.MidiOut()
 
         self.builder = Gtk.Builder()
         self.builder.add_from_file( filedef )
+        self.builder.connect_signals( self )
 
-        self.initErrorWindow()
-        self.initMainWindow()
+        self.notesStore = self.builder.get_object( SEQ_NOTES_STORE )
 
     def run( self ):
         ports = self.midiIn.get_ports()
         for i in range( len(ports) ):
-            if( self.DEVICE_NAME in ports[i] ):
+            if( DEVICE_NAME in ports[i] ):
                 self.midiIn.open_port( i )
-                self.midiName = ports[i]
+                midiName = ports[i]
                 break
 
         ports = self.midiOut.get_ports()
         for i in range( len(ports) ):
-            if( self.DEVICE_NAME in ports[i] ):
+            if( DEVICE_NAME in ports[i] ):
                 self.midiOut.open_port( i )
                 break
 
         if( self.midiIn.is_port_open() and self.midiOut.is_port_open() ):
-            self.setStatusBar( self.midiName )
+            self.builder.get_object( STATUS_BAR_ID ).set_text( midiName )
             self.midiIn.set_callback( self.midiCallback )
             self.sendSysEx( [ 0x75 ] )
-            self.mainWindow.show_all()
+            self.builder.get_object( MAIN_WIN_ID ).show()
         else:
-            self.errorWindow.show_all()
+            self.builder.get_object( ERROR_WIN_ID ).show()
         Gtk.main()
 
-    def onWindowDestroy( self, *args ):
-        self.midiIn.close_port()
-        self.midiOut.close_port()
-        Gtk.main_quit()
-
-    def onExitClicked( self, button, win ):
-        win.destroy()
-
     def sendSysEx( self, sysex ):
-        msg = [ 0xF0 ] + self.MANU_ID + self.DEVICE_ID + sysex + [ 0xF7 ]
-        print( "SendSysEx:", bytes(msg).hex().upper() )
+        msg = [ 0xF0 ] + MANUF_ID + DEVICE_ID + sysex + [ 0xF7 ]
+        #print( "SendSysEx:", bytes(msg).hex().upper() )
         self.midiOut.send_message( msg )
 
     def midiCallback( self, msg, data=None ):
         data = bytes( msg[0] )
-        print( "MidiCallBack:", data.hex().upper() )
+        #print( "MidiCallBack:", data.hex().upper() )
 
         start = data[:7]
         resp  = data[7:-1]
         end   = data[-1]
 
-        if( start.hex().upper() != bytes( [ 0xF0 ] + self.MANU_ID + self.DEVICE_ID ).hex().upper() ): return
+        if( start.hex().upper() != bytes( [ 0xF0 ] + MANUF_ID + DEVICE_ID ).hex().upper() ): return
         if( len( resp ) == 0 ): return
         if( end != 0xF7 ): return
 
@@ -80,101 +100,181 @@ class SynthCrave():
         elif( resp[0] == 0x78 ):
             GLib.idle_add( self.showSequencer, resp[1:] )
 
-    # Error Window
-    def initErrorWindow( self ):
-        self.errorWindow = self.builder.get_object( "Error Mindow" )
+    def onWindowDestroy( self, widget ):
+        self.midiIn.close_port()
+        self.midiOut.close_port()
+        Gtk.main_quit()
 
-        self.errorWindow.connect( "destroy", self.onWindowDestroy )
-        self.builder.get_object( "ErrWin/Exit" ).connect( "clicked", self.onExitClicked, self.errorWindow )
-
-    # Main Window
-    def initMainWindow( self ):
-        self.mainWindow = self.builder.get_object( "Main Window" )
-        self.statusBar = self.builder.get_object( "MainWin/Status Bar" )
-
-        self.mainWindow.connect( "destroy", self.onWindowDestroy )
-        self.builder.get_object( "MainWin/Exit" ).connect( "clicked", self.onExitClicked, self.mainWindow )
-
-        self.initTabGeneral()
-        self.initTabSequencer()
-
-    def setStatusBar( self, msg ):
-        self.statusBar.set_text( msg )
+    def onExitClicked( self, widget ):
+        widget.get_toplevel().destroy()
 
     # Tab general
-    def initTabGeneral( self ):
-        self.pitchBend = self.builder.get_object( "MainWin/General/Pitch Bend" )
-        self.clockSource = self.builder.get_object( "MainWin/General/Clock Source")
-        self.clockType = self.builder.get_object( "MainWin/General/Clock Type" )
-        self.clockEdge = self.builder.get_object( "MainWin/General/Clock Edge" )
-        self.midiClockOut = self.builder.get_object( "MainWin/General/Midi Clock Out" )
-        self.assignMode = self.builder.get_object( "MainWin/General/Assign Mode" )
-        self.sequencerAutoPlay = self.builder.get_object( "MainWin/General/Sequencer Auto Play" )
-        self.accentVelocityTreshold = self.builder.get_object( "MainWin/General/Accent Velocity Threshold" )
-        self.factorySettings = self.builder.get_object( "MainWin/General/Factory Settings" )
+    def showParameters( self, data ):
+        self.fromDevice = True
+        self.builder.get_object( GEN_PITCH_BEND ).set_value( data[0] )
+        self.builder.get_object( GEN_MIDI_CLOCK ).set_active( data[2] )
+        self.builder.get_object( GEN_AUTO_PLAY ).set_active( data[3] )
+        self.builder.get_object( GEN_CLOCK_SRC ).set_active( data[4] )
+        self.builder.get_object( GEN_CLOCK_TYPE ).set_active( data[5] )
+        self.builder.get_object( GEN_CLOCK_EDGE ).set_active( data[6] )
+        self.builder.get_object( GEN_ASSIGN_MODE ).set_active( data[7] )
+        self.builder.get_object( GEN_ACC_VEL_THR ).set_value( data[8] )
+        self.fromDevice = False
 
-        self.pitchBend.connect( "value-changed", self.setSpinButton, [ 0x11, 0x00, 0x00 ]  )
-        self.clockSource.connect( "changed", self.setComboBox, [ 0x1B, 0x00 ]  )
-        self.clockType.connect( "changed", self.setComboBox, [ 0x1A, 0x00 ] )
-        self.clockEdge.connect( "changed", self.setComboBox, [ 0x19, 0x00 ] )
-        self.midiClockOut.connect( "changed", self.setComboBox, [ 0x17, 0x00 ] )
-        self.assignMode.connect( "changed", self.setComboBox, [ 0x1F, 0x00 ] )
-        self.sequencerAutoPlay.connect( "changed", self.setComboBox, [ 0x1D, 0x00 ] )
-        self.accentVelocityTreshold.connect( "value-changed", self.setSpinButton, [ 0x1C, 0x00 ] )
-        self.factorySettings.connect( "clicked", self.onFactorySettingClicked )
+    def setSpinButton( self, widget ):
+        if( self.fromDevice ): return
 
-    def setSpinButton( self, widget, data=None ):
-        if( not self.fromDevice ):
-            data[1] = int( widget.get_value() )
-            self.sendSysEx( data )
+        oID = Gtk.Buildable.get_name( widget )
+        if( oID == GEN_PITCH_BEND ):
+            data = [ 0x11, 0x00, 0x00 ]
+        elif( oID == GEN_ACC_VEL_THR ):
+            data = [ 0x1C, 0x00 ]
+        else:
+            return
+
+        data[1] = int( widget.get_value() )
+        self.sendSysEx( data )
 
     def setComboBox( self, widget, data=None ):
-        if( not self.fromDevice ):
-            data[1] = int( widget.get_active() )
-            self.sendSysEx( data )
+        if( self.fromDevice ): return
 
-    def onFactorySettingClicked( self, widget, data=None ):
+        oID = Gtk.Buildable.get_name( widget )
+        if( oID == GEN_CLOCK_SRC ):
+            data = [ 0x1B, 0x00 ]
+        elif( oID == GEN_CLOCK_TYPE ):
+            data = [ 0x1A, 0x00 ]
+        elif( oID == GEN_CLOCK_EDGE ):
+            data = [ 0x19, 0x00 ]
+        elif( oID == GEN_MIDI_CLOCK ):
+            data = [ 0x17, 0x00 ]
+        elif( oID == GEN_ASSIGN_MODE ):
+            data = [ 0x1F, 0x00 ]
+        elif( oID == GEN_AUTO_PLAY ):
+            data = [ 0x1D, 0x00 ]
+        else:
+            return
+
+        data[1] = int( widget.get_active() )
+        self.sendSysEx( data )
+
+    def onFactorySettingClicked( self, widget ):
         self.sendSysEx( [ 0x7D ] )
         self.sendSysEx( [ 0x75 ] )
 
-    def showParameters( self, data ):
-        self.fromDevice = True
-        self.pitchBend.set_value( data[0] )
-        self.midiClockOut.set_active( data[2] )
-        self.sequencerAutoPlay.set_active( data[3] )
-        self.clockSource.set_active( data[4] )
-        self.clockType.set_active( data[5] )
-        self.clockEdge.set_active( data[6] )
-        self.assignMode.set_active( data[7] )
-        self.accentVelocityTreshold.set_value( data[8] )
-        self.fromDevice = False
-
     # Tab Sequencer
-    def initTabSequencer( self ):
-        self.notes = self.builder.get_object( "ListStore MainWin/Sequencer/Notes" )
+    def onClearClicked( self, widget ):
+        self.notesStore.clear()
+        self.notesStore.append( [ 1, False, "C", 3, "50.0%", 1, 64, False, False ] )
 
-        self.builder.get_object( "MainWin/Sequencer/Recall" ).connect( "clicked", self.onSeqRecallClicked )
-        self.builder.get_object( "MainWin/Sequencer/Rest" ).connect( "toggled", self.onNoteToggle, 1 )
-        self.builder.get_object( "MainWin/Sequencer/Glide" ).connect( "toggled", self.onNoteToggle, 6 )
-        self.builder.get_object( "MainWin/Sequencer/Accent" ).connect( "toggled", self.onNoteToggle, 7 )
-
-        #self.seqListaNotas.append( [ 1, False, "C#-1", "75.5%", 4, 120, False, False ] )
-        #for i in range( 1, 32 ):
-        #    self.seqListaNotas.append( [ i + 1, True, "C#-1", "75.5%", 4, 120, False, False ] )
-
-    def onSeqRecallClicked( self, widget, data=None ):
-        bank = int( self.builder.get_object( "MainWin/Sequencer/Bank" ).get_active() )
-        patt = int( self.builder.get_object( "MainWin/Sequencer/Pattern" ).get_active() )
+    def onSeqRecallClicked( self, widget ):
+        bank = int( self.builder.get_object( SEQ_BANK ).get_active() )
+        patt = int( self.builder.get_object( SEQ_PATTERN ).get_active() )
         self.sendSysEx( [ 0x77, bank, patt ] )
 
-    def onNoteToggle( self, cell, path, col ):
-        self.notes[path][col]= not self.notes[path][col]
+    def onStoreClicked( self, widget ):
+        bank  = int( self.builder.get_object( SEQ_BANK ).get_active() )
+        patt  = int( self.builder.get_object( SEQ_PATTERN ).get_active() )
+        steps = int( self.builder.get_object( SEQ_LENGTH ).get_value() ) - 1
+        swing = int( self.builder.get_object( SEQ_SWING ).get_value() )
 
-    GATES = [ "12,5%", "25.0%", "37.5%", "50.0%", "62.5%", "75.0%", "87.5%", "100%" ]
-    NOTES = [ "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" ]
+        data = [0]*8
+        data[0] = bank
+        data[1] = patt
+        data[2] = 0 if swing< 66 else 1
+        data[3] = swing-50 if swing < 66 else swing - 66
+        data[4] = 0
+        data[5] = steps >> 3
+        data[6] = 0
+        data[7] = steps & 0x07
+
+        n = len( self.notesStore )
+        for i in range( n ):
+            elem     = self.notesStore[i].iter
+            rest     = int( self.notesStore[elem][1] )
+            note     = NOTES.index( self.notesStore[elem][2] )
+            octave   = int( self.notesStore[elem][3] )
+            gate     = GATES.index( self.notesStore[elem][4] )
+            ratchet  = int( self.notesStore[elem][5] ) - 1
+            velocity = int( self.notesStore[elem][6] )
+            glide    = int( self.notesStore[elem][7] )
+            accent   = int( self.notesStore[elem][8] )
+
+            note = note + (octave+1)*12
+            row = [0]*8
+            row[0] = note >> 4
+            row[1] = note & 0x0F
+            row[2] = gate
+            row[3] = ratchet
+            row[4] = velocity >> 4
+            row[5] = velocity & 0x0F
+            row[6] = rest*0x08 + accent*0x04 + glide*0x01
+            row[7] = 0
+
+            data = data + row
+
+        for i in range( n, 32 ):
+            data = data + [ 0x00, 0x04, 0x02, 0x03, 0x00, 0x40, 0x00, 0x00 ]
+
+        self.sendSysEx( [ 0x78 ] + data )
+
+    def onSeqLengthChanged( self, widget ):
+        if( self.fromDevice ): return
+
+        l = int( widget.get_value() )
+        n = len( self.notesStore )
+
+        if( l > n ):
+            l = l - n
+            for i in range( l ):
+                self.notesStore.append( [ n+i+1, False, "C", 3, "50.0%", 1, 64, False, False ] )
+        elif( l < n ):
+            elems = []
+            for i in range( l, n ):
+                elems.append( self.notesStore[i].iter )
+            for e in elems:
+                self.notesStore.remove( e )
+
+    def onRestToggled( self, cell, path ):
+        self.notesStore[path][1]= not self.notesStore[path][1]
+
+    def onNotedEdited( self, cell, path, tree_iter ):
+        note = tree_iter
+        octave = self.notesStore[path][3]
+        if( note != "C" and octave == 9 ):
+            note = "C"
+        self.notesStore[path][2] = note
+
+    def onOctaveEdited( self, cell, path, tree_iter ):
+        octave = int( tree_iter )
+        note = self.notesStore[path][2]
+        if( note != "C" and octave == 9 ):
+            octave = 8
+        self.notesStore[path][3] = octave
+
+    def onGateEdited( self, cell, path, tree_iter ):
+        self.notesStore[path][4] = tree_iter
+
+    def onRatchetEdited( self, cell, path, tree_iter ):
+        self.notesStore[path][5] = int( tree_iter )
+
+    def onVelocityEdited( self, cell, path, tree_iter ):
+        try:
+            v = int( tree_iter )
+        except:
+            v = 64
+        v = 0 if v < 0 else v
+        v= 127 if v > 127 else v
+        self.notesStore[path][6] = v
+
+    def onGlideToggled( self, cell, path ):
+        self.notesStore[path][7]= not self.notesStore[path][7]
+
+    def onAccentToggled( self, cell, path ):
+        self.notesStore[path][8]= not self.notesStore[path][8]
 
     def showSequencer( self, data ):
         self.fromDevice = True
+
         bank   = int( data[0] ) + 1
         patt   = int( data[1] ) + 1
 
@@ -183,32 +283,27 @@ class SynthCrave():
         else: swing = 66 + int( swing[1] )
         nsteps = int( data[5] )*8 + int( data[7] ) + 1
 
-        self.builder.get_object( "MainWin/Sequencer/Swing" ).set_value( swing )
-        self.builder.get_object( "MainWin/Sequencer/Length" ).set_value( nsteps )
-
-        #print( "Bank: %d, Pattern: %d, Swing: %d%%" % ( bank, patt, swing ) )
+        self.builder.get_object( SEQ_SWING ).set_value( swing )
+        self.builder.get_object( SEQ_LENGTH ).set_value( nsteps )
 
         steps  = data[8:]
-        self.notes.clear()
+        self.notesStore.clear()
         for i in range(nsteps):
             step = steps[0:8]
-            #print( step.hex().upper() )
-
             n = step[0:2]
             n = int( n[1] ) + int( n[0] )*16 + 1
             octave = int( n/12 ) - 1
-            note = self.NOTES[ n%12 - 1]
-            gate = self.GATES[ int(step[2]) ]
+            note = NOTES[ n%12 - 1]
+            gate = GATES[ int(step[2]) ]
             ratchet = int( step[3] ) + 1
-            n = step[4:6]
-            velocity = int( n[1] ) + int( n[0] )*16
+            velocity = int( step[5] ) + int( step[4] )*16
             glide  = 1 if( step[6] & 0x01 != 0 ) else 0
             accent = 1 if( step[6] & 0x04 != 0 ) else 0
             rest   = 1 if( step[6] & 0x08 != 0 ) else 0
             unk      = step[7]
-            #print( "Step %02d: Note: %-2s%2d, Gate Length: %5s, Ratchet: %d, Velocity: %3d, Glide: %d, Accent: %d, Rest: %d" % ( i, note, octave, gate, ratchet, velocity, glide, accent, rest ) )
-            self.notes.append( [ i + 1, rest, "%s%d" % (note, octave), gate, ratchet, velocity, glide, accent ] )
+            self.notesStore.append( [ i + 1, rest, note, octave, gate, ratchet, velocity, glide, accent ] )
             steps = steps[8:]
+
         self.fromDevice = False
 
 

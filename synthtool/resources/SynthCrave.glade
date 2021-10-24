@@ -33,7 +33,12 @@
     <property name="step-increment">1</property>
     <property name="page-increment">5</property>
   </object>
-  <object class="GtkWindow" id="Error Mindow">
+  <object class="GtkAdjustment" id="Adjustment Speed">
+    <property name="upper">127</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkWindow" id="Error Window">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Behringer Crave</property>
     <property name="resizable">False</property>
@@ -51,6 +56,7 @@
             <property name="ypad">40</property>
             <property name="label" translatable="yes">Behringer Crave Not Found</property>
             <property name="justify">center</property>
+            <signal name="destroy" handler="onWindowDestroy" swapped="no"/>
           </object>
           <packing>
             <property name="expand">True</property>
@@ -67,6 +73,7 @@
             <property name="halign">center</property>
             <property name="valign">center</property>
             <property name="margin-bottom">20</property>
+            <signal name="clicked" handler="onExitClicked" swapped="no"/>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -77,6 +84,38 @@
       </object>
     </child>
   </object>
+  <object class="GtkListStore" id="ListStore Gates">
+    <columns>
+      <!-- column-name Gate -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">12.5%</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">25.0%</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">37.5%</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">50.0%</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">62.5%</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">75.0%</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">87.5%</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">100%</col>
+      </row>
+    </data>
+  </object>
   <object class="GtkListStore" id="ListStore MainWin/Sequencer/Notes">
     <columns>
       <!-- column-name # -->
@@ -85,6 +124,8 @@
       <column type="gboolean"/>
       <!-- column-name Note -->
       <column type="gchararray"/>
+      <!-- column-name Octave -->
+      <column type="gint"/>
       <!-- column-name Gate -->
       <column type="gchararray"/>
       <!-- column-name Ratchet -->
@@ -99,19 +140,127 @@
     <data>
       <row>
         <col id="0">1</col>
-        <col id="1">True</col>
-        <col id="2">C3</col>
-        <col id="3" translatable="yes">50.0%</col>
-        <col id="4">1</col>
-        <col id="5">64</col>
-        <col id="6">True</col>
-        <col id="7">True</col>
+        <col id="1">False</col>
+        <col id="2">C</col>
+        <col id="3">3</col>
+        <col id="4" translatable="yes">50.0%</col>
+        <col id="5">1</col>
+        <col id="6">64</col>
+        <col id="7">False</col>
+        <col id="8">False</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="ListStore Notes">
+    <columns>
+      <!-- column-name Note -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">C</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">C#</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">D</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">D#</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">E</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">F</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">F#</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">G</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">G#</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">A</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">A#</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">B</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="ListStore Octaves">
+    <columns>
+      <!-- column-name Octave -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">-1</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">0</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">1</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">2</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">3</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">4</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">5</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">6</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">7</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">8</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">9</col>
+      </row>
+    </data>
+  </object>
+  <object class="GtkListStore" id="ListStore Ratchet">
+    <columns>
+      <!-- column-name Ratchet -->
+      <column type="gchararray"/>
+    </columns>
+    <data>
+      <row>
+        <col id="0" translatable="yes">1</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">2</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">3</col>
+      </row>
+      <row>
+        <col id="0" translatable="yes">4</col>
       </row>
     </data>
   </object>
   <object class="GtkWindow" id="Main Window">
     <property name="can-focus">False</property>
     <property name="title" translatable="yes">Behringer Crave</property>
+    <property name="resizable">False</property>
+    <signal name="destroy" handler="onWindowDestroy" swapped="no"/>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -227,6 +376,7 @@
                             <property name="adjustment">Adjustment MainWin/General/Pitch Bend</property>
                             <property name="numeric">True</property>
                             <property name="update-policy">if-valid</property>
+                            <signal name="value-changed" handler="setSpinButton" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -281,6 +431,7 @@
                               <item translatable="yes">MIDI CC4</item>
                               <item translatable="yes">MIDI CC7</item>
                             </items>
+                            <signal name="changed" handler="setComboBox" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -308,6 +459,7 @@
                             <property name="adjustment">Adjustment MainWin/General/Accent Velocity Threshold</property>
                             <property name="numeric">True</property>
                             <property name="update-policy">if-valid</property>
+                            <signal name="value-changed" handler="setSpinButton" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -351,6 +503,7 @@
                               <item translatable="yes">External</item>
                               <item translatable="yes">Auto</item>
                             </items>
+                            <signal name="changed" handler="setComboBox" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -406,6 +559,7 @@
                               <item translatable="yes">48PPQN</item>
                               <item translatable="yes">CV</item>
                             </items>
+                            <signal name="changed" handler="setComboBox" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -434,6 +588,7 @@
                               <item translatable="yes">Fall</item>
                               <item translatable="yes">Raise</item>
                             </items>
+                            <signal name="changed" handler="setComboBox" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -462,6 +617,7 @@
                               <item translatable="yes">Disable</item>
                               <item translatable="yes">Enable</item>
                             </items>
+                            <signal name="changed" handler="setComboBox" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -490,6 +646,7 @@
                               <item translatable="yes">Disable</item>
                               <item translatable="yes">Enable</item>
                             </items>
+                            <signal name="changed" handler="setComboBox" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -527,6 +684,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="receives-default">True</property>
+                    <signal name="clicked" handler="onFactorySettingClicked" swapped="no"/>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -637,6 +795,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="margin-start">20</property>
+                        <signal name="clicked" handler="onClearClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -651,6 +810,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="margin-start">10</property>
+                        <signal name="clicked" handler="onSeqRecallClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -665,6 +825,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="margin-start">10</property>
+                        <signal name="clicked" handler="onStoreClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -707,6 +868,7 @@
                         <property name="numeric">True</property>
                         <property name="update-policy">if-valid</property>
                         <property name="value">1</property>
+                        <signal name="value-changed" handler="onSeqLengthChanged" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -787,6 +949,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">True</property>
                         <property name="shadow-type">in</property>
+                        <property name="propagate-natural-width">True</property>
                         <child>
                           <object class="GtkTreeView" id="MainWin/Sequencer/Notes">
                             <property name="visible">True</property>
@@ -800,9 +963,10 @@
                               <object class="GtkTreeSelection"/>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: #">
                                 <property name="sizing">fixed</property>
                                 <property name="title" translatable="yes">#</property>
+                                <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
                                   <object class="GtkCellRendererText">
@@ -815,13 +979,15 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: Rest">
                                 <property name="sizing">fixed</property>
                                 <property name="title" translatable="yes">Rest</property>
                                 <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
-                                  <object class="GtkCellRendererToggle" id="MainWin/Sequencer/Rest"/>
+                                  <object class="GtkCellRendererToggle">
+                                    <signal name="toggled" handler="onRestToggled" swapped="no"/>
+                                  </object>
                                   <attributes>
                                     <attribute name="active">1</attribute>
                                   </attributes>
@@ -829,15 +995,19 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: Note">
                                 <property name="sizing">fixed</property>
                                 <property name="title" translatable="yes">Note</property>
                                 <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
-                                  <object class="GtkCellRendererText" id="MainWin/Sequencer/Note">
+                                  <object class="GtkCellRendererCombo">
                                     <property name="xalign">0.49000000953674316</property>
                                     <property name="editable">True</property>
+                                    <property name="has-entry">False</property>
+                                    <property name="model">ListStore Notes</property>
+                                    <property name="text-column">0</property>
+                                    <signal name="edited" handler="onNotedEdited" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="text">2</attribute>
@@ -846,15 +1016,18 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: Octave">
                                 <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Gate</property>
+                                <property name="title" translatable="yes">Octave</property>
                                 <property name="expand">True</property>
-                                <property name="alignment">0.5</property>
                                 <child>
-                                  <object class="GtkCellRendererText" id="MainWin/Sequencer/Gate">
+                                  <object class="GtkCellRendererCombo">
                                     <property name="xalign">0.49000000953674316</property>
                                     <property name="editable">True</property>
+                                    <property name="has-entry">False</property>
+                                    <property name="model">ListStore Octaves</property>
+                                    <property name="text-column">0</property>
+                                    <signal name="edited" handler="onOctaveEdited" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="text">3</attribute>
@@ -863,16 +1036,19 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: Gate">
                                 <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Ratchet</property>
+                                <property name="title" translatable="yes">Gate</property>
                                 <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
-                                  <object class="GtkCellRendererSpin" id="MainWin/Sequencer/Ratchet">
-                                    <property name="yalign">0.49000000953674316</property>
+                                  <object class="GtkCellRendererCombo">
+                                    <property name="xalign">0.49000000953674316</property>
                                     <property name="editable">True</property>
-                                    <property name="adjustment">Adjustment MainWin/Sequencer/Ratchet</property>
+                                    <property name="has-entry">False</property>
+                                    <property name="model">ListStore Gates</property>
+                                    <property name="text-column">0</property>
+                                    <signal name="edited" handler="onGateEdited" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="text">4</attribute>
@@ -881,15 +1057,19 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: Ratchet">
                                 <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Velocity</property>
+                                <property name="title" translatable="yes">Ratchet</property>
                                 <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
-                                  <object class="GtkCellRendererText" id="MainWin/Sequencer/Velocity">
+                                  <object class="GtkCellRendererCombo">
                                     <property name="xalign">0.49000000953674316</property>
                                     <property name="editable">True</property>
+                                    <property name="has-entry">False</property>
+                                    <property name="model">ListStore Ratchet</property>
+                                    <property name="text-column">0</property>
+                                    <signal name="edited" handler="onRatchetEdited" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="text">5</attribute>
@@ -898,29 +1078,53 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: Velocity">
                                 <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Glide</property>
+                                <property name="title" translatable="yes">Velocity</property>
                                 <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
-                                  <object class="GtkCellRendererToggle" id="MainWin/Sequencer/Glide"/>
+                                  <object class="GtkCellRendererSpin">
+                                    <property name="xalign">0.49000000953674316</property>
+                                    <property name="editable">True</property>
+                                    <property name="max-width-chars">3</property>
+                                    <property name="adjustment">Adjustment Speed</property>
+                                    <signal name="edited" handler="onVelocityEdited" swapped="no"/>
+                                  </object>
                                   <attributes>
-                                    <attribute name="active">6</attribute>
+                                    <attribute name="text">6</attribute>
                                   </attributes>
                                 </child>
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn">
+                              <object class="GtkTreeViewColumn" id="Col: Glide">
+                                <property name="sizing">fixed</property>
+                                <property name="title" translatable="yes">Glide</property>
+                                <property name="expand">True</property>
+                                <property name="alignment">0.5</property>
+                                <child>
+                                  <object class="GtkCellRendererToggle">
+                                    <signal name="toggled" handler="onGlideToggled" swapped="no"/>
+                                  </object>
+                                  <attributes>
+                                    <attribute name="active">7</attribute>
+                                  </attributes>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkTreeViewColumn" id="Col: Accent">
                                 <property name="sizing">fixed</property>
                                 <property name="title" translatable="yes">Accent</property>
                                 <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
-                                  <object class="GtkCellRendererToggle" id="MainWin/Sequencer/Accent"/>
+                                  <object class="GtkCellRendererToggle">
+                                    <signal name="toggled" handler="onAccentToggled" swapped="no"/>
+                                  </object>
                                   <attributes>
-                                    <attribute name="active">7</attribute>
+                                    <attribute name="active">8</attribute>
                                   </attributes>
                                 </child>
                               </object>
@@ -1023,6 +1227,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
+                <signal name="clicked" handler="onExitClicked" swapped="no"/>
               </object>
               <packing>
                 <property name="tab-fill">False</property>
