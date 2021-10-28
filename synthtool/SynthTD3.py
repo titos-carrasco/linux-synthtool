@@ -6,24 +6,27 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk,GLib
 
-DEVICE_NAME     = "CRAVE MIDI"
+DEVICE_NAME     = "TD-3 MIDI"
 MANUF_ID        = [ 0x00, 0x20, 0x32 ]  # Behringer GmbH
-DEVICE_ID       = [ 0x00, 0x01, 0x05 ]  # CRAVE
+DEVICE_ID       = [ 0x00, 0x01, 0x0A ]  # TD-3
 
-UI_MAIN_WIN         = "MainWin"
-UI_ERROR_WIN        = "ErrorWin"
-UI_STATUS_BAR       = "MainWin/Status Bar"
-UI_PITCH_BEND       = "MainWin/General/Pitch Bend"
-UI_CLOCK_SOURCE     = "MainWin/General/Clock Source"
-UI_CLOCK_RATE       = "MainWin/General/Clock Rate"
-UI_CLOCK_POLARITY   = "MainWin/General/Clock Polarity"
-UI_MIDI_CLOCK_OUT   = "MainWin/General/Midi Clock Out"
-UI_ASSIGN_MODE      = "MainWin/General/Assign Mode"
-UI_AUTO_PLAY        = "MainWin/General/Sequencer Auto Play"
-UI_ACC_VEL_THR      = "MainWin/General/Accent Velocity Threshold"
-UI_NOTES_TREE       = "MainWin/Sequencer/Notes"
-UI_NOTES_STORE      = "ListStore MainWin/Sequencer/Notes"
-UI_FIRMWARE_VERSION = "MainWin/Update/Firmware Version"
+UI_MAIN_WIN           = "MainWin"
+UI_ERROR_WIN          = "ErrorWin"
+UI_STATUS_BAR         = "MainWin/Status Bar"
+UI_MIDI_IN_CHANNEL    = "MainWin/General/MIDI IN Channel"
+UI_MIDI_OUT_CHANNEL   = "MainWin/General/MIDI OUT Channel"
+UI_PITCH_BEND         = "MainWin/General/Pitch Bend"
+UI_KEY_PRIORITY       = "MainWin/General/Key Priority"
+UI_MIDI_IN_TRANSPOSE  = "MainWin/General/MIDI IN Transpose"
+UI_MULTI_TRIGGER      = "MainWin/General/Multi Trigger"
+UI_MULTI_TRIGGER_MODE = "MainWin/General/Multi Trigger Mode"
+UI_CLOCK_SOURCE       = "MainWin/General/Clock Source"
+UI_CLOCK_RATE         = "MainWin/General/Clock Rate"
+UI_CLOCK_POLARITY     = "MainWin/General/Clock Polarity"
+UI_ACC_VEL_THR        = "MainWin/General/Accent Velocity Threshold"
+UI_NOTES_TREE         = "MainWin/Sequencer/Notes"
+UI_NOTES_STORE        = "ListStore MainWin/Sequencer/Notes"
+UI_FIRMWARE_VERSION   = "MainWin/Update/Firmware Version"
 
 UI_SEQ_BANK         = "MainWin/Sequencer/Bank"
 UI_SEQ_PATTERN      = "MainWin/Sequencer/Pattern"
@@ -37,7 +40,7 @@ GATES = [ "12.5%", "25.0%", "37.5%", "50.0%", "62.5%", "75.0%", "87.5%", "100%" 
 NOTES = [ "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" ]
 
 
-class SynthCrave():
+class SynthTD3():
 
     def __init__( self, filedef ):
         self.midiIn = rtmidi.MidiIn()
@@ -47,20 +50,23 @@ class SynthCrave():
         self.builder = Gtk.Builder()
         self.builder.add_from_file( filedef )
 
-        self.ui_error_win        = self.builder.get_object( UI_ERROR_WIN )
-        self.ui_main_win         = self.builder.get_object( UI_MAIN_WIN )
-        self.ui_status_bar       = self.builder.get_object( UI_STATUS_BAR )
-        self.ui_pitch_bend       = self.builder.get_object( UI_PITCH_BEND )
-        self.ui_clock_source     = self.builder.get_object( UI_CLOCK_SOURCE )
-        self.ui_clock_rate       = self.builder.get_object( UI_CLOCK_RATE )
-        self.ui_clock_polarity   = self.builder.get_object( UI_CLOCK_POLARITY )
-        self.ui_midi_clock_out   = self.builder.get_object( UI_MIDI_CLOCK_OUT )
-        self.ui_assign_mode      = self.builder.get_object( UI_ASSIGN_MODE )
-        self.ui_auto_play        = self.builder.get_object( UI_AUTO_PLAY )
-        self.ui_acc_vel_thr      = self.builder.get_object( UI_ACC_VEL_THR )
-        self.ui_notes_tree       = self.builder.get_object( UI_NOTES_TREE )
-        self.ui_notes_store      = self.builder.get_object( UI_NOTES_STORE )
-        self.ui_firmware_version = self.builder.get_object( UI_FIRMWARE_VERSION )
+        self.ui_error_win          = self.builder.get_object( UI_ERROR_WIN )
+        self.ui_main_win           = self.builder.get_object( UI_MAIN_WIN )
+        self.ui_status_bar         = self.builder.get_object( UI_STATUS_BAR )
+        self.ui_midi_in_channel    = self.builder.get_object( UI_MIDI_IN_CHANNEL )
+        self.ui_midi_out_channel   = self.builder.get_object( UI_MIDI_OUT_CHANNEL )
+        self.ui_pitch_bend         = self.builder.get_object( UI_PITCH_BEND )
+        self.ui_key_priority       = self.builder.get_object( UI_KEY_PRIORITY )
+        self.ui_midi_in_transpose  = self.builder.get_object( UI_MIDI_IN_TRANSPOSE )
+        self.ui_multi_trigger      = self.builder.get_object( UI_MULTI_TRIGGER )
+        self.ui_multi_trigger_mode = self.builder.get_object( UI_MULTI_TRIGGER_MODE )
+        self.ui_clock_source       = self.builder.get_object( UI_CLOCK_SOURCE )
+        self.ui_clock_rate         = self.builder.get_object( UI_CLOCK_RATE )
+        self.ui_clock_polarity     = self.builder.get_object( UI_CLOCK_POLARITY )
+        self.ui_acc_vel_thr        = self.builder.get_object( UI_ACC_VEL_THR )
+        self.ui_notes_tree         = self.builder.get_object( UI_NOTES_TREE )
+        self.ui_notes_store        = self.builder.get_object( UI_NOTES_STORE )
+        self.ui_firmware_version   = self.builder.get_object( UI_FIRMWARE_VERSION )
 
         self.ui_seq_bank    = self.builder.get_object( UI_SEQ_BANK )
         self.ui_seq_pattern = self.builder.get_object( UI_SEQ_BANK )
@@ -103,11 +109,13 @@ class SynthCrave():
 
     def sendSysEx( self, data ):
         sysex = [ 0xF0 ] + MANUF_ID + DEVICE_ID + data + [ 0xF7 ]
-        #print( "SEND:", bytes( sysex ).hex().upper() )
+        print( "SEND:", bytes( sysex ).hex().upper() )
 
         self.waiting = True
         self.midiOut.send_message( sysex )
-        while( self.waiting ): time.sleep( 0.01 )
+        t = time.time()
+        while( self.waiting and (time.time() - t) < 0.5): time.sleep( 0.01 )
+        self.waiting = False
 
     def midiCallback( self, msg, data=None ):
         data = bytes( msg[0] )
@@ -120,7 +128,7 @@ class SynthCrave():
         if( len( resp ) == 0 ): return
         if( end != 0xF7 ): return
 
-        #print( "RECV:", resp.hex().upper() )
+        print( "RECV:", resp.hex().upper() )
 
         # firmware version
         if( resp[0:2] == bytes( [ 0x09, 0x00 ] ) ):
@@ -132,8 +140,8 @@ class SynthCrave():
             GLib.idle_add( self.showParameters, resp[1:] )
 
         # a pattern
-        elif( resp[0] == 0x78 ):
-            GLib.idle_add( self.showSequencer, resp[1:] )
+        #elif( resp[0] == 0x78 ):
+        #    GLib.idle_add( self.showSequencer, resp[1:] )
 
         self.waiting = False
 
@@ -152,29 +160,19 @@ class SynthCrave():
     def showParameters( self, data ):
         self.fromApp = True
 
-        self.ui_pitch_bend.set_value( data[0] )
-        self.ui_clock_source.set_active( data[4] )
-        self.ui_clock_rate.set_active( data[5] )
-        self.ui_clock_polarity.set_active( data[6] )
-        self.ui_midi_clock_out.set_active( data[2] )
-        self.ui_assign_mode.set_active( data[7] )
-        self.ui_auto_play.set_active( data[3] )
-        self.ui_acc_vel_thr.set_value( data[8] )
-
-        self.set_sensitive()
+        self.ui_midi_in_channel.set_value( data[1] + 1 )
+        self.ui_midi_out_channel.set_value( data[0] + 1 )
+        #self.ui_pitch_bend.set_value( data[3] )
+        #self.ui_key_priority.set_active( data[4] )
+        #self.ui_midi_in_transpose.set_value( data[2] - 12 )
+        #self.ui_multi_trigger.set_active( data[5] )
+        #self.ui_multi_trigger_mode.set_active( data[6] )
+        #self.ui_clock_source.set_active( data[8] )
+        #self.ui_clock_rate.set_active( data[7] )
+        #self.ui_clock_polarity.set_active( data[7] )
+        #self.ui_acc_vel_thr.set_value( data[9] )
 
         self.fromApp = False
-
-    def set_sensitive( self ):
-        if( self.ui_clock_source.get_active() == 3 ):
-            self.ui_clock_rate.set_sensitive( True )
-            if( self.ui_clock_rate.get_active() != 4 ):
-                self.ui_clock_polarity.set_sensitive( True )
-            else:
-                self.ui_clock_polarity.set_sensitive( False )
-        else:
-            self.ui_clock_polarity.set_sensitive( False )
-            self.ui_clock_rate.set_sensitive( False )
 
     def onPitchBendChanged( self, widget ):
         if( self.fromApp ): return
@@ -188,20 +186,16 @@ class SynthCrave():
         data = [ 0x1B, clock_source ]
         self.sendSysEx( data )
 
-        self.set_sensitive()
-
-    def onClockRateChanged( self, widget ):
+    def onClockTypeChanged( self, widget ):
         if( self.fromApp ): return
-        clock_rate = int( widget.get_active() )
-        data = [ 0x1A, clock_rate ]
+        clock_type = int( widget.get_active() )
+        data = [ 0x1A, clock_type ]
         self.sendSysEx( data )
 
-        self.set_sensitive()
-
-    def onClockPolarityChanged( self, widget ):
+    def onClockEdgeChanged( self, widget ):
         if( self.fromApp ): return
-        clock_polarity = int( widget.get_active() )
-        data = [ 0x19, clock_polarity ]
+        clock_edge = int( widget.get_active() )
+        data = [ 0x19, clock_edge ]
         self.sendSysEx( data )
 
     def onMidiClockOutChanged( self, widget ):
@@ -390,5 +384,5 @@ class SynthCrave():
 
 # Show Time
 if( __name__ == "__main__" ):
-    synth = SynthCrave( "resources/SynthCrave.glade" )
+    synth = SynthTD3( "resources/SynthTD3.glade" )
     synth.run()

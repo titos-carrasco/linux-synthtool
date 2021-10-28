@@ -1,4 +1,6 @@
 from SynthCrave import SynthCrave
+from SynthWasp import SynthWasp
+from SynthTD3 import SynthTD3
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -6,12 +8,14 @@ from gi.repository import Gtk,GLib
 
 MAIN_WIN_UI = "resources/SynthTool.glade"
 CRAVE_UI    = "resources/SynthCrave.glade"
+WASP_UI     = "resources/SynthWasp.glade"
+TD3_UI     = "resources/SynthTD3.glade"
 
-MAIN_WIN_ID = "Main Window"
-CRAVE_ID    = "Crave"
-WASP_ID     = "Wasp"
-TD3_ID      = "TD-3"
-PRO1_ID     = "PRO-1"
+MAIN_WIN = "Main Window"
+CRAVE    = "Crave"
+WASP     = "Wasp"
+TD3      = "TD-3"
+PRO1     = "PRO-1"
 
 class SynthTool():
 
@@ -21,7 +25,7 @@ class SynthTool():
         self.builder = Gtk.Builder()
         self.builder.add_from_file( filedef )
         self.builder.connect_signals( self )
-        self.builder.get_object( MAIN_WIN_ID ).show()
+        self.builder.get_object( MAIN_WIN ).show()
 
     def onMainWindowDestroy( self, widget ):
         Gtk.main_quit()
@@ -41,8 +45,12 @@ def main():
     synthTool = SynthTool( MAIN_WIN_UI )
     Gtk.main()
     name = synthTool.getSynth()
-    if( name == CRAVE_ID ):
+    if( name == CRAVE ):
         SynthCrave( CRAVE_UI ).run()
+    elif( name == WASP ):
+        SynthWasp( WASP_UI ).run()
+    elif( name == TD3 ):
+        SynthTD3( TD3_UI ).run()
 
 # Show Time
 main()

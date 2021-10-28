@@ -2,10 +2,28 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkAdjustment" id="Adjustment MainWin/General/Accent Velocity Threshold">
+  <object class="GtkAdjustment" id="Adjustment MainWin/General/Accent velocity Threshold">
     <property name="upper">127</property>
     <property name="step-increment">1</property>
-    <property name="page-increment">8</property>
+    <property name="page-increment">32</property>
+  </object>
+  <object class="GtkAdjustment" id="Adjustment MainWin/General/MIDI IN Channel">
+    <property name="lower">1</property>
+    <property name="upper">16</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">4</property>
+  </object>
+  <object class="GtkAdjustment" id="Adjustment MainWin/General/MIDI IN Transpose">
+    <property name="lower">-12</property>
+    <property name="upper">12</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">4</property>
+  </object>
+  <object class="GtkAdjustment" id="Adjustment MainWin/General/MIDI OUT Channel">
+    <property name="lower">1</property>
+    <property name="upper">16</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">4</property>
   </object>
   <object class="GtkAdjustment" id="Adjustment MainWin/General/Pitch Bend">
     <property name="upper">12</property>
@@ -14,33 +32,13 @@
   </object>
   <object class="GtkAdjustment" id="Adjustment MainWin/Sequencer/Length">
     <property name="lower">1</property>
-    <property name="upper">32</property>
-    <property name="value">1</property>
+    <property name="upper">16</property>
     <property name="step-increment">1</property>
-    <property name="page-increment">5</property>
-  </object>
-  <object class="GtkAdjustment" id="Adjustment MainWin/Sequencer/Ratchet">
-    <property name="lower">1</property>
-    <property name="upper">4</property>
-    <property name="value">1</property>
-    <property name="step-increment">1</property>
-    <property name="page-increment">1</property>
-  </object>
-  <object class="GtkAdjustment" id="Adjustment MainWin/Sequencer/Swing">
-    <property name="lower">50</property>
-    <property name="upper">75</property>
-    <property name="value">50</property>
-    <property name="step-increment">1</property>
-    <property name="page-increment">5</property>
-  </object>
-  <object class="GtkAdjustment" id="Adjustment Speed">
-    <property name="upper">127</property>
-    <property name="step-increment">1</property>
-    <property name="page-increment">10</property>
+    <property name="page-increment">4</property>
   </object>
   <object class="GtkWindow" id="ErrorWin">
     <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Behringer Crave</property>
+    <property name="title" translatable="yes">Behringer TD-3</property>
     <property name="resizable">False</property>
     <child>
       <object class="GtkBox">
@@ -54,7 +52,7 @@
             <property name="can-focus">False</property>
             <property name="xpad">40</property>
             <property name="ypad">40</property>
-            <property name="label" translatable="yes">Behringer Crave Not Found</property>
+            <property name="label" translatable="yes">Behringer TD-3 Not Found</property>
             <property name="justify">center</property>
             <signal name="destroy" handler="onWindowDestroy" swapped="no"/>
           </object>
@@ -84,38 +82,6 @@
       </object>
     </child>
   </object>
-  <object class="GtkListStore" id="ListStore Gates">
-    <columns>
-      <!-- column-name Gate -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
-        <col id="0" translatable="yes">12.5%</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">25.0%</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">37.5%</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">50.0%</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">62.5%</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">75.0%</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">87.5%</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">100%</col>
-      </row>
-    </data>
-  </object>
   <object class="GtkListStore" id="ListStore MainWin/Sequencer/Notes">
     <columns>
       <!-- column-name # -->
@@ -126,13 +92,7 @@
       <column type="gchararray"/>
       <!-- column-name Octave -->
       <column type="gint"/>
-      <!-- column-name Gate -->
-      <column type="gchararray"/>
-      <!-- column-name Ratchet -->
-      <column type="gint"/>
-      <!-- column-name Velocity -->
-      <column type="gint"/>
-      <!-- column-name Glide -->
+      <!-- column-name Slide -->
       <column type="gboolean"/>
       <!-- column-name Accent -->
       <column type="gboolean"/>
@@ -143,11 +103,8 @@
         <col id="1">False</col>
         <col id="2">C</col>
         <col id="3">3</col>
-        <col id="4" translatable="yes">50.0%</col>
-        <col id="5">1</col>
-        <col id="6">64</col>
-        <col id="7">False</col>
-        <col id="8">False</col>
+        <col id="4">False</col>
+        <col id="5">False</col>
       </row>
     </data>
   </object>
@@ -202,47 +159,6 @@
     </columns>
     <data>
       <row>
-        <col id="0" translatable="yes">-1</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">0</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">1</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">2</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">3</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">4</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">5</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">6</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">7</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">8</col>
-      </row>
-      <row>
-        <col id="0" translatable="yes">9</col>
-      </row>
-    </data>
-  </object>
-  <object class="GtkListStore" id="ListStore Ratchet">
-    <columns>
-      <!-- column-name Ratchet -->
-      <column type="gchararray"/>
-    </columns>
-    <data>
-      <row>
         <col id="0" translatable="yes">1</col>
       </row>
       <row>
@@ -258,7 +174,7 @@
   </object>
   <object class="GtkWindow" id="MainWin">
     <property name="can-focus">False</property>
-    <property name="title" translatable="yes">Behringer Crave</property>
+    <property name="title" translatable="yes">Behringer TD-3</property>
     <property name="resizable">False</property>
     <signal name="destroy" handler="onWindowDestroy" swapped="no"/>
     <child>
@@ -282,7 +198,7 @@
                 <property name="orientation">vertical</property>
                 <property name="spacing">12</property>
                 <child>
-                  <!-- n-columns=2 n-rows=6 -->
+                  <!-- n-columns=2 n-rows=8 -->
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
@@ -294,11 +210,23 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="halign">start</property>
-                        <property name="label" translatable="yes">Pitch Bend Range</property>
+                        <property name="label" translatable="yes">MIDI IN Transpose</property>
                       </object>
                       <packing>
                         <property name="left-attach">0</property>
-                        <property name="top-attach">0</property>
+                        <property name="top-attach">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Multi Trigger</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">5</property>
                       </packing>
                     </child>
                     <child>
@@ -310,24 +238,36 @@
                       </object>
                       <packing>
                         <property name="left-attach">0</property>
-                        <property name="top-attach">1</property>
+                        <property name="top-attach">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Accent Velocity Threshold</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">7</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">12</property>
+                        <property name="spacing">4</property>
                         <child>
-                          <object class="GtkSpinButton" id="MainWin/General/Pitch Bend">
+                          <object class="GtkComboBoxText" id="MainWin/General/Multi Trigger">
                             <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="max-length">2</property>
-                            <property name="input-purpose">digits</property>
-                            <property name="adjustment">Adjustment MainWin/General/Pitch Bend</property>
-                            <property name="numeric">True</property>
-                            <property name="update-policy">if-valid</property>
-                            <signal name="value-changed" handler="onPitchBendChanged" swapped="no"/>
+                            <property name="can-focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="active">0</property>
+                            <items>
+                              <item translatable="yes">OFF</item>
+                              <item translatable="yes">ON</item>
+                            </items>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -339,7 +279,8 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">[0, 12]</property>
+                            <property name="margin-start">10</property>
+                            <property name="label" translatable="yes">Mode</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -347,10 +288,27 @@
                             <property name="position">1</property>
                           </packing>
                         </child>
+                        <child>
+                          <object class="GtkComboBoxText" id="MainWin/General/Multi Trigger Mode">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="active">0</property>
+                            <items>
+                              <item translatable="yes">Slide</item>
+                              <item translatable="yes">Legato</item>
+                            </items>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
-                        <property name="top-attach">0</property>
+                        <property name="top-attach">5</property>
                       </packing>
                     </child>
                     <child>
@@ -364,10 +322,9 @@
                             <property name="can-focus">True</property>
                             <property name="max-length">3</property>
                             <property name="input-purpose">digits</property>
-                            <property name="adjustment">Adjustment MainWin/General/Accent Velocity Threshold</property>
+                            <property name="adjustment">Adjustment MainWin/General/Accent velocity Threshold</property>
                             <property name="numeric">True</property>
                             <property name="update-policy">if-valid</property>
-                            <signal name="value-changed" handler="onAccentVelocityThresholdChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -390,7 +347,7 @@
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
-                        <property name="top-attach">5</property>
+                        <property name="top-attach">7</property>
                       </packing>
                     </child>
                     <child>
@@ -398,6 +355,87 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkSpinButton" id="MainWin/General/Pitch Bend">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="max-length">2</property>
+                                <property name="text" translatable="yes">0</property>
+                                <property name="input-purpose">digits</property>
+                                <property name="adjustment">Adjustment MainWin/General/Pitch Bend</property>
+                                <property name="numeric">True</property>
+                                <property name="update-policy">if-valid</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="label" translatable="yes">[0, 12]</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkComboBoxText" id="MainWin/General/Key Priority">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="active">0</property>
+                            <items>
+                              <item translatable="yes">Low</item>
+                              <item translatable="yes">High</item>
+                              <item translatable="yes">Last</item>
+                            </items>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="spacing">4</property>
                         <child>
                           <object class="GtkComboBoxText" id="MainWin/General/Clock Source">
                             <property name="visible">True</property>
@@ -409,9 +447,7 @@
                               <item translatable="yes">MIDI DIN</item>
                               <item translatable="yes">MIDI USB</item>
                               <item translatable="yes">TRIG</item>
-                              <item translatable="yes">Auto</item>
                             </items>
-                            <signal name="changed" handler="onClockSourceChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -424,6 +460,7 @@
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="halign">start</property>
+                            <property name="margin-start">10</property>
                             <property name="label" translatable="yes">Rate</property>
                           </object>
                           <packing>
@@ -443,9 +480,7 @@
                               <item translatable="yes">2 PPQ</item>
                               <item translatable="yes">24 PPQ</item>
                               <item translatable="yes">48 PPQ</item>
-                              <item translatable="yes">CV</item>
                             </items>
-                            <signal name="changed" handler="onClockRateChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -458,6 +493,7 @@
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="halign">start</property>
+                            <property name="margin-start">10</property>
                             <property name="label" translatable="yes">Polarity</property>
                           </object>
                           <packing>
@@ -476,7 +512,6 @@
                               <item translatable="yes">Fall</item>
                               <item translatable="yes">Raise</item>
                             </items>
-                            <signal name="changed" handler="onClockPolarityChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -487,35 +522,82 @@
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
+                        <property name="top-attach">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">MIDI IN Channel	</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="spacing">12</property>
+                        <child>
+                          <object class="GtkSpinButton" id="MainWin/General/MIDI IN Channel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="max-length">3</property>
+                            <property name="text" translatable="yes">0</property>
+                            <property name="input-purpose">digits</property>
+                            <property name="adjustment">Adjustment MainWin/General/MIDI IN Channel</property>
+                            <property name="numeric">True</property>
+                            <property name="update-policy">if-valid</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">[1, 16]</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left-attach">1</property>
+                        <property name="top-attach">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">MIDI OUT Channel	</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
                         <property name="top-attach">1</property>
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkBox">
+                      <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="spacing">12</property>
-                        <child>
-                          <object class="GtkComboBoxText" id="MainWin/General/Midi Clock Out">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="active">0</property>
-                            <items>
-                              <item translatable="yes">Disable</item>
-                              <item translatable="yes">Enable</item>
-                            </items>
-                            <signal name="changed" handler="onMidiClockOutChanged" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Pitch Bend Semitones</property>
                       </object>
                       <packing>
-                        <property name="left-attach">1</property>
+                        <property name="left-attach">0</property>
                         <property name="top-attach">2</property>
                       </packing>
                     </child>
@@ -525,30 +607,15 @@
                         <property name="can-focus">False</property>
                         <property name="spacing">12</property>
                         <child>
-                          <object class="GtkComboBoxText" id="MainWin/General/Assign Mode">
+                          <object class="GtkSpinButton" id="MainWin/General/MIDI OUT Channel">
                             <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="active">0</property>
-                            <items>
-                              <item translatable="yes">Accent</item>
-                              <item translatable="yes">Sequencer Clock</item>
-                              <item translatable="yes">Sequencer Clock/2</item>
-                              <item translatable="yes">Sequencer Clock/4</item>
-                              <item translatable="yes">Sequencer Step Ramp</item>
-                              <item translatable="yes">Sequencer Step Saw</item>
-                              <item translatable="yes">Sequencer Step Triangle</item>
-                              <item translatable="yes">Sequencer Step Random</item>
-                              <item translatable="yes">Sequencer Step 1 Trigger Output</item>
-                              <item translatable="yes">MIDI Velocity</item>
-                              <item translatable="yes">MIDI Channel Pressure</item>
-                              <item translatable="yes">MIDI Pitch Bend</item>
-                              <item translatable="yes">MIDI CC1</item>
-                              <item translatable="yes">MIDI CC2</item>
-                              <item translatable="yes">MIDI CC4</item>
-                              <item translatable="yes">MIDI CC7</item>
-                            </items>
-                            <signal name="changed" handler="onAssignModeChanged" swapped="no"/>
+                            <property name="can-focus">True</property>
+                            <property name="max-length">3</property>
+                            <property name="text" translatable="yes">0</property>
+                            <property name="input-purpose">digits</property>
+                            <property name="adjustment">Adjustment MainWin/General/MIDI OUT Channel</property>
+                            <property name="numeric">True</property>
+                            <property name="update-policy">if-valid</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -556,9 +623,33 @@
                             <property name="position">0</property>
                           </packing>
                         </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">[1, 16]</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
                       </object>
                       <packing>
                         <property name="left-attach">1</property>
+                        <property name="top-attach">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="label" translatable="yes">Key Priority</property>
+                      </object>
+                      <packing>
+                        <property name="left-attach">0</property>
                         <property name="top-attach">3</property>
                       </packing>
                     </child>
@@ -566,19 +657,41 @@
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
-                        <property name="orientation">vertical</property>
                         <property name="spacing">12</property>
                         <child>
-                          <object class="GtkComboBoxText" id="MainWin/General/Sequencer Auto Play">
+                          <object class="GtkBox">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="active">0</property>
-                            <items>
-                              <item translatable="yes">Disable</item>
-                              <item translatable="yes">Enable</item>
-                            </items>
-                            <signal name="changed" handler="onAutoPlayChanged" swapped="no"/>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkSpinButton" id="MainWin/General/MIDI IN Transpose">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="max-length">3</property>
+                                <property name="text" translatable="yes">0</property>
+                                <property name="input-purpose">digits</property>
+                                <property name="adjustment">Adjustment MainWin/General/MIDI IN Transpose</property>
+                                <property name="numeric">True</property>
+                                <property name="update-policy">if-valid</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="label" translatable="yes">[-12, 12]</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -590,54 +703,6 @@
                       <packing>
                         <property name="left-attach">1</property>
                         <property name="top-attach">4</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="label" translatable="yes">MIDI Clock Out</property>
-                      </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">2</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="label" translatable="yes">Assign Mode</property>
-                      </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="label" translatable="yes">Sequencer Auto Play</property>
-                      </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">4</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="label" translatable="yes">Accent Velocity Threshold</property>
-                      </object>
-                      <packing>
-                        <property name="left-attach">0</property>
-                        <property name="top-attach">5</property>
                       </packing>
                     </child>
                   </object>
@@ -695,14 +760,13 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="margin-top">8</property>
-                    <property name="spacing">4</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="margin-start">10</property>
                         <property name="margin-end">5</property>
-                        <property name="label" translatable="yes">Bank</property>
+                        <property name="label" translatable="yes">Pattern Group</property>
                         <property name="justify">fill</property>
                       </object>
                       <packing>
@@ -712,19 +776,15 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkComboBoxText" id="MainWin/Sequencer/Bank">
+                      <object class="GtkComboBoxText" id="MainWin/Sequencer/Pattern Group">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="active">0</property>
                         <items>
-                          <item translatable="yes">1</item>
-                          <item translatable="yes">2</item>
-                          <item translatable="yes">3</item>
-                          <item translatable="yes">4</item>
-                          <item translatable="yes">5</item>
-                          <item translatable="yes">6</item>
-                          <item translatable="yes">7</item>
-                          <item translatable="yes">8</item>
+                          <item translatable="yes">I</item>
+                          <item translatable="yes">II</item>
+                          <item translatable="yes">III</item>
+                          <item translatable="yes">IV</item>
                         </items>
                       </object>
                       <packing>
@@ -739,7 +799,8 @@
                         <property name="can-focus">False</property>
                         <property name="margin-start">10</property>
                         <property name="margin-end">5</property>
-                        <property name="label" translatable="yes">Pattern</property>
+                        <property name="label" translatable="yes">Pattern Section</property>
+                        <property name="justify">fill</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -748,9 +809,40 @@
                       </packing>
                     </child>
                     <child>
+                      <object class="GtkComboBoxText" id="MainWin/Sequencer/Pattern Section">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="active">0</property>
+                        <items>
+                          <item translatable="yes">A</item>
+                          <item translatable="yes">B</item>
+                        </items>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">10</property>
+                        <property name="margin-end">5</property>
+                        <property name="label" translatable="yes">Pattern</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                    <child>
                       <object class="GtkComboBoxText" id="MainWin/Sequencer/Pattern">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
+                        <property name="margin-end">20</property>
                         <property name="active">0</property>
                         <items>
                           <item translatable="yes">1</item>
@@ -766,52 +858,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">3</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="MainWin/Sequencer/Recall">
-                        <property name="label" translatable="yes">Recall</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">True</property>
-                        <property name="margin-start">48</property>
-                        <signal name="clicked" handler="onSeqRecallClicked" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">4</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="MainWin/Sequencer/Store">
-                        <property name="label" translatable="yes">Store</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">True</property>
-                        <property name="margin-start">10</property>
-                        <signal name="clicked" handler="onStoreClicked" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
                         <property name="position">5</property>
-                      </packing>
-                    </child>
-                    <child>
-                      <object class="GtkButton" id="MainWin/Sequencer/Clear">
-                        <property name="label" translatable="yes">Clear</property>
-                        <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="receives-default">True</property>
-                        <property name="margin-start">48</property>
-                        <signal name="clicked" handler="onClearClicked" swapped="no"/>
-                      </object>
-                      <packing>
-                        <property name="expand">False</property>
-                        <property name="fill">True</property>
-                        <property name="position">6</property>
                       </packing>
                     </child>
                   </object>
@@ -825,7 +872,6 @@
                   <object class="GtkBox">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="spacing">4</property>
                     <child>
                       <object class="GtkLabel">
                         <property name="visible">True</property>
@@ -850,7 +896,6 @@
                         <property name="numeric">True</property>
                         <property name="update-policy">if-valid</property>
                         <property name="value">1</property>
-                        <signal name="value-changed" handler="onSeqLengthChanged" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -863,7 +908,7 @@
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="margin-start">5</property>
-                        <property name="label" translatable="yes">[1, 32]</property>
+                        <property name="label" translatable="yes">[1, 16]</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -877,7 +922,7 @@
                         <property name="can-focus">False</property>
                         <property name="margin-start">10</property>
                         <property name="margin-end">5</property>
-                        <property name="label" translatable="yes">Swing</property>
+                        <property name="label" translatable="yes">Triplet</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -886,15 +931,14 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkSpinButton" id="MainWin/Sequencer/Swing">
+                      <object class="GtkComboBoxText" id="MainWin/Sequencer/Triplet">
                         <property name="visible">True</property>
-                        <property name="can-focus">True</property>
-                        <property name="max-length">3</property>
-                        <property name="input-purpose">digits</property>
-                        <property name="adjustment">Adjustment MainWin/Sequencer/Swing</property>
-                        <property name="numeric">True</property>
-                        <property name="update-policy">if-valid</property>
-                        <property name="value">50</property>
+                        <property name="can-focus">False</property>
+                        <property name="active">0</property>
+                        <items>
+                          <item translatable="yes">Disable</item>
+                          <item translatable="yes">Enable</item>
+                        </items>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -902,23 +946,64 @@
                         <property name="position">4</property>
                       </packing>
                     </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
                     <child>
-                      <object class="GtkLabel">
+                      <object class="GtkButton" id="MainWin/Sequencer/Recall">
+                        <property name="label" translatable="yes">Recall</property>
                         <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="label" translatable="yes">%	</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="margin-start">10</property>
                       </object>
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">True</property>
-                        <property name="position">5</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="MainWin/Sequencer/Store">
+                        <property name="label" translatable="yes">Store</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="margin-start">10</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="MainWin/Sequencer/Clear">
+                        <property name="label" translatable="yes">Clear</property>
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="margin-start">40</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
                 <child>
@@ -939,6 +1024,7 @@
                             <property name="model">ListStore MainWin/Sequencer/Notes</property>
                             <property name="headers-clickable">False</property>
                             <property name="enable-search">False</property>
+                            <property name="search-column">0</property>
                             <property name="show-expanders">False</property>
                             <property name="enable-grid-lines">both</property>
                             <child internal-child="selection">
@@ -1002,6 +1088,7 @@
                                 <property name="sizing">fixed</property>
                                 <property name="title" translatable="yes">Octave</property>
                                 <property name="expand">True</property>
+                                <property name="alignment">0.5</property>
                                 <child>
                                   <object class="GtkCellRendererCombo">
                                     <property name="xalign">0.49000000953674316</property>
@@ -1018,71 +1105,9 @@
                               </object>
                             </child>
                             <child>
-                              <object class="GtkTreeViewColumn" id="Col: Gate">
+                              <object class="GtkTreeViewColumn" id="Col: Slide">
                                 <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Gate</property>
-                                <property name="expand">True</property>
-                                <property name="alignment">0.5</property>
-                                <child>
-                                  <object class="GtkCellRendererCombo">
-                                    <property name="xalign">0.49000000953674316</property>
-                                    <property name="editable">True</property>
-                                    <property name="has-entry">False</property>
-                                    <property name="model">ListStore Gates</property>
-                                    <property name="text-column">0</property>
-                                    <signal name="edited" handler="onGateEdited" swapped="no"/>
-                                  </object>
-                                  <attributes>
-                                    <attribute name="text">4</attribute>
-                                  </attributes>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn" id="Col: Ratchet">
-                                <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Ratchet</property>
-                                <property name="expand">True</property>
-                                <property name="alignment">0.5</property>
-                                <child>
-                                  <object class="GtkCellRendererCombo">
-                                    <property name="xalign">0.49000000953674316</property>
-                                    <property name="editable">True</property>
-                                    <property name="has-entry">False</property>
-                                    <property name="model">ListStore Ratchet</property>
-                                    <property name="text-column">0</property>
-                                    <signal name="edited" handler="onRatchetEdited" swapped="no"/>
-                                  </object>
-                                  <attributes>
-                                    <attribute name="text">5</attribute>
-                                  </attributes>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn" id="Col: Velocity">
-                                <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Velocity</property>
-                                <property name="expand">True</property>
-                                <property name="alignment">0.5</property>
-                                <child>
-                                  <object class="GtkCellRendererSpin">
-                                    <property name="xalign">0.49000000953674316</property>
-                                    <property name="editable">True</property>
-                                    <property name="max-width-chars">3</property>
-                                    <property name="adjustment">Adjustment Speed</property>
-                                    <signal name="edited" handler="onVelocityEdited" swapped="no"/>
-                                  </object>
-                                  <attributes>
-                                    <attribute name="text">6</attribute>
-                                  </attributes>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkTreeViewColumn" id="Col: Glide">
-                                <property name="sizing">fixed</property>
-                                <property name="title" translatable="yes">Glide</property>
+                                <property name="title" translatable="yes">Slide</property>
                                 <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
@@ -1090,7 +1115,7 @@
                                     <signal name="toggled" handler="onGlideToggled" swapped="no"/>
                                   </object>
                                   <attributes>
-                                    <attribute name="active">7</attribute>
+                                    <attribute name="active">4</attribute>
                                   </attributes>
                                 </child>
                               </object>
@@ -1106,7 +1131,7 @@
                                     <signal name="toggled" handler="onAccentToggled" swapped="no"/>
                                   </object>
                                   <attributes>
-                                    <attribute name="active">8</attribute>
+                                    <attribute name="active">5</attribute>
                                   </attributes>
                                 </child>
                               </object>
@@ -1124,7 +1149,7 @@
                   <packing>
                     <property name="expand">True</property>
                     <property name="fill">True</property>
-                    <property name="position">2</property>
+                    <property name="position">3</property>
                   </packing>
                 </child>
               </object>
@@ -1174,6 +1199,20 @@
               </packing>
             </child>
             <child>
+              <placeholder/>
+            </child>
+            <child type="tab">
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="label" translatable="yes">Calibration</property>
+              </object>
+              <packing>
+                <property name="position">3</property>
+                <property name="tab-fill">False</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkBox" id="MainWin/Update">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
@@ -1194,7 +1233,7 @@
                 </child>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">4</property>
               </packing>
             </child>
             <child type="tab">
@@ -1204,7 +1243,7 @@
                 <property name="label" translatable="yes">Update</property>
               </object>
               <packing>
-                <property name="position">3</property>
+                <property name="position">4</property>
                 <property name="tab-fill">False</property>
               </packing>
             </child>
