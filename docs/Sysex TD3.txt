@@ -1,0 +1,50 @@
+On Init
+SEND :F0 00 20 32 00 01 0A 08 00 F7                             : get firmware version
+RECV: F0 00 20 32 00 01 0A 09 00 aa bb cc F7                    : firmware aa.bb.cc
+
+SEND: F0 00 20 32 00 01 0A 02 F7                                : ?
+RESP: F0 00 20 32 00 01 0A 03 00 F7                             : ?
+
+SEND: F0 00 20 32 00 01 0A 75 F7                                : get config
+RECV: F0 00 20 32 00 01 0A 76 aa bb cc dd ee ff gg hh ii jj F7  : aa=midi out, bb=midi in, cc=transpose, dd=pitch bend, ee=key priority
+                                                                : ff=multitrigger, gg=clock polarity, hh=clock rate, ii=clock source, jj=accent
+
+SEND: F0 00 20 32 00 01 0A 7D F7                                : Restore Factory Settings
+RECV: no answer
+
+SEND: F0 00 20 32 00 01 0A 0E 01 aa bb F7                       : midi channel aa=0x00-0x0F (out) bb=in
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 11 aa 00 F7                          : pitch bend semitones aa=0x00-0x0C
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 12 aa F7                             : key priority aa=0x00 (low) 1 (high) 2 (last)
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 0F aa F7                             : midi in transpose aa=0x00 (-12) - 0x18 (+12)
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 14 aa 00 F7                          : multi trigger aa=0x00 (off) 0x01 (on)
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 14 aa 00 F7                          : multitrigger off ->Mode aa=00 (slide) 02 (legato)
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 1B aa F7                             : Clock source aa=00 internal 01 midi din 02 (midi usb) o3 (trig)
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 1A aa F7                             : clock source TRIG-> Rate aa=00 (1PPS) a 03 (48PPQ)
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 19 aa F7                             :clock source TRIG->Polarity aa=00 (fall) 01(raise)
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND: F0 00 20 32 00 01 0A 1C aa F7                             : accent velocity th aa=0x00 - 0x7F
+RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+
+SEND:
+RECV:
+
+SEND:
+RECV:
+

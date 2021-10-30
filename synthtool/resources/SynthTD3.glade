@@ -265,44 +265,16 @@
                             <property name="halign">start</property>
                             <property name="active">0</property>
                             <items>
-                              <item translatable="yes">OFF</item>
+                              <item translatable="yes">OFF - Mode Slide</item>
                               <item translatable="yes">ON</item>
+                              <item translatable="yes">OFF - Mode Legato</item>
                             </items>
+                            <signal name="changed" handler="onMultiTriggerChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">10</property>
-                            <property name="label" translatable="yes">Mode</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkComboBoxText" id="MainWin/General/Multi Trigger Mode">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="active">0</property>
-                            <items>
-                              <item translatable="yes">Slide</item>
-                              <item translatable="yes">Legato</item>
-                            </items>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
@@ -325,6 +297,7 @@
                             <property name="adjustment">Adjustment MainWin/General/Accent velocity Threshold</property>
                             <property name="numeric">True</property>
                             <property name="update-policy">if-valid</property>
+                            <signal name="value-changed" handler="onAccentVelocityThresholdChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -370,6 +343,7 @@
                                 <property name="adjustment">Adjustment MainWin/General/Pitch Bend</property>
                                 <property name="numeric">True</property>
                                 <property name="update-policy">if-valid</property>
+                                <signal name="value-changed" handler="onPitchBendChanged" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -418,6 +392,7 @@
                               <item translatable="yes">High</item>
                               <item translatable="yes">Last</item>
                             </items>
+                            <signal name="changed" handler="onKeyPriorityChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -448,6 +423,7 @@
                               <item translatable="yes">MIDI USB</item>
                               <item translatable="yes">TRIG</item>
                             </items>
+                            <signal name="changed" handler="onClockSourceChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -481,6 +457,7 @@
                               <item translatable="yes">24 PPQ</item>
                               <item translatable="yes">48 PPQ</item>
                             </items>
+                            <signal name="changed" handler="onClockRateChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -512,6 +489,7 @@
                               <item translatable="yes">Fall</item>
                               <item translatable="yes">Raise</item>
                             </items>
+                            <signal name="changed" handler="onClockPolarityChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -552,6 +530,7 @@
                             <property name="adjustment">Adjustment MainWin/General/MIDI IN Channel</property>
                             <property name="numeric">True</property>
                             <property name="update-policy">if-valid</property>
+                            <signal name="value-changed" handler="onMidiInChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -616,6 +595,7 @@
                             <property name="adjustment">Adjustment MainWin/General/MIDI OUT Channel</property>
                             <property name="numeric">True</property>
                             <property name="update-policy">if-valid</property>
+                            <signal name="value-changed" handler="onMidiOutChanged" swapped="no"/>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -673,6 +653,7 @@
                                 <property name="adjustment">Adjustment MainWin/General/MIDI IN Transpose</property>
                                 <property name="numeric">True</property>
                                 <property name="update-policy">if-valid</property>
+                                <signal name="value-changed" handler="onMidiInTransposeChanged" swapped="no"/>
                               </object>
                               <packing>
                                 <property name="expand">False</property>

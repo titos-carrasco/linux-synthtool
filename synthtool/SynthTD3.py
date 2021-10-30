@@ -162,58 +162,84 @@ class SynthTD3():
 
         self.ui_midi_in_channel.set_value( data[1] + 1 )
         self.ui_midi_out_channel.set_value( data[0] + 1 )
-        #self.ui_pitch_bend.set_value( data[3] )
-        #self.ui_key_priority.set_active( data[4] )
-        #self.ui_midi_in_transpose.set_value( data[2] - 12 )
-        #self.ui_multi_trigger.set_active( data[5] )
-        #self.ui_multi_trigger_mode.set_active( data[6] )
-        #self.ui_clock_source.set_active( data[8] )
-        #self.ui_clock_rate.set_active( data[7] )
-        #self.ui_clock_polarity.set_active( data[7] )
-        #self.ui_acc_vel_thr.set_value( data[9] )
+        self.ui_pitch_bend.set_value( data[3] )
+        self.ui_key_priority.set_active( data[4] )
+        self.ui_midi_in_transpose.set_value( data[2] - 12 )
+        self.ui_clock_source.set_active( data[8] )
+        self.ui_clock_rate.set_active( data[7] )
+        self.ui_clock_polarity.set_active( data[6] )
+        self.ui_multi_trigger.set_active( data[5] )
+        self.ui_acc_vel_thr.set_value( data[9] )
+
+        self.set_sensitive()
 
         self.fromApp = False
 
+    def set_sensitive( self ):
+        clock_source = self.ui_clock_source.get_active()
+        if( clock_source == 3  ):
+            self.ui_clock_rate.set_sensitive( True )
+            self.ui_clock_polarity.set_sensitive( True )
+        else:
+            self.ui_clock_rate.set_sensitive( False )
+            self.ui_clock_polarity.set_sensitive( False )
+
+    def onMidiInChanged( self, widget ):
+        if( self.fromApp ): return
+        channel_in = int( widget.get_value() ) - 1
+        channel_out = int( self.ui_midi_out_channel.get_value() ) - 1
+        data = [ 0x0E, 0x01, channel_out, channel_in ]
+        self.sendSysEx( data )
+
+    def onMidiOutChanged( self, widget ):
+        if( self.fromApp ): return
+        channel_out = int( widget.get_value() ) - 1
+        channel_in = int( self.ui_midi_in_channel.get_value() ) - 1
+        data = [ 0x0E, 0x01, channel_out, channel_in ]
+        self.sendSysEx( data )
+
     def onPitchBendChanged( self, widget ):
         if( self.fromApp ): return
-        pitch_bend = int( widget.get_value() )
-        data = [ 0x11, pitch_bend, 0x00 ]
+        semitone = int( widget.get_value() )
+        data = [ 0x11, semitone, 0x00 ]
+        self.sendSysEx( data )
+
+    def onKeyPriorityChanged( self, widget ):
+        if( self.fromApp ): return
+        priority = int( widget.get_active() )
+        data = [ 0x12, priority ]
+        self.sendSysEx( data )
+
+    def onMidiInTransposeChanged( self, widget ):
+        if( self.fromApp ): return
+        transpose = int( widget.get_value() ) + 12
+        data = [ 0x0F, transpose ]
+        self.sendSysEx( data )
+
+    def onMultiTriggerChanged( self, widget ):
+        if( self.fromApp ): return
+        multitrigger = int( widget.get_active() )
+        data = [ 0x14, multitrigger ]
         self.sendSysEx( data )
 
     def onClockSourceChanged( self, widget ):
         if( self.fromApp ): return
-        clock_source = int( widget.get_active() )
-        data = [ 0x1B, clock_source ]
+        source = int( widget.get_active() )
+        data = [ 0x1B, source ]
         self.sendSysEx( data )
 
-    def onClockTypeChanged( self, widget ):
+        self.set_sensitive()
+
+    def onClockRateChanged( self, widget ):
         if( self.fromApp ): return
-        clock_type = int( widget.get_active() )
-        data = [ 0x1A, clock_type ]
+        rate = int( widget.get_active() )
+        data = [ 0x1A, rate ]
         self.sendSysEx( data )
 
-    def onClockEdgeChanged( self, widget ):
+    def onClockPolarityChanged( self, widget ):
         if( self.fromApp ): return
-        clock_edge = int( widget.get_active() )
-        data = [ 0x19, clock_edge ]
-        self.sendSysEx( data )
-
-    def onMidiClockOutChanged( self, widget ):
-        if( self.fromApp ): return
-        clock_out = int( widget.get_active() )
-        data = [ 0x17, clock_out ]
-        self.sendSysEx( data )
-
-    def onAssignModeChanged( self, widget ):
-        if( self.fromApp ): return
-        assign_mode = int( widget.get_active() )
-        data = [ 0x1F, assign_mode ]
-        self.sendSysEx( data )
-
-    def onAutoPlayChanged( self, widget ):
-        if( self.fromApp ): return
-        auto_play = int( widget.get_active() )
-        data = [ 0x1D, auto_play ]
+        polarity = int( widget.get_active() )
+        data = [ 0x19, polarity ]
         self.sendSysEx( data )
 
     def onAccentVelocityThresholdChanged( self, widget ):
