@@ -9,15 +9,15 @@ DEVICE_NAME     = "WASP DELUXE MIDI"
 MANUF_ID        = [ 0x00, 0x20, 0x32 ]  # Behringer GmbH
 DEVICE_ID       = [ 0x00, 0x01, 0x06 ]  # Wasp
 
-UI_ERROR_WIN           = "ErrorWin"
-UI_MAIN_WIN            = "MainWin"
-UI_STATUS_BAR          = "MainWin/Status Bar"
-UI_MIDI_CHANNEL_SWITCH = "MainWin/General/Midi Channel Switches"
-UI_MIDI_CHANNEL        = "MainWin/General/Midi Channel"
-UI_KEY_PRIORITY        = "MainWin/General/Key Priority"
-UI_MIDI_IN_TRANSPOSE   = "MainWin/General/MIDI IN Transpose"
-UI_MIDI_MULTI_TRIGGER  = "MainWin/General/Multi Trigger"
-UI_FIRMWARE_VERSION    = "MainWin/Update/Firmware Version"
+UI_MAIN_WIN              = "MainWin"
+UI_ERROR_WIN             = "ErrorWin"
+UI_STATUS_BAR            = "MainWin/Status Bar"
+UI_MIDI_CHANNEL_SWITCHES = "MainWin/General/Midi Channel Switches"
+UI_MIDI_CHANNEL          = "MainWin/General/Midi Channel"
+UI_KEY_PRIORITY          = "MainWin/General/Key Priority"
+UI_MIDI_IN_TRANSPOSE     = "MainWin/General/MIDI IN Transpose"
+UI_MIDI_MULTI_TRIGGER    = "MainWin/General/Multi Trigger"
+UI_FIRMWARE_VERSION      = "MainWin/Update/Firmware Version"
 
 class SynthWasp():
 
@@ -29,15 +29,15 @@ class SynthWasp():
         self.builder = Gtk.Builder()
         self.builder.add_from_file( filedef )
 
-        self.ui_error_win           = self.builder.get_object( UI_ERROR_WIN )
-        self.ui_main_win            = self.builder.get_object( UI_MAIN_WIN )
-        self.ui_status_bar          = self.builder.get_object( UI_STATUS_BAR )
-        self.ui_midi_channel_switch = self.builder.get_object( UI_MIDI_CHANNEL_SWITCH )
-        self.ui_midi_channel        = self.builder.get_object( UI_MIDI_CHANNEL )
-        self.ui_key_priority        = self.builder.get_object( UI_KEY_PRIORITY )
-        self.ui_midi_in_transpose   = self.builder.get_object( UI_MIDI_IN_TRANSPOSE )
-        self.ui_midi_multitrigger   = self.builder.get_object( UI_MIDI_MULTI_TRIGGER )
-        self.ui_firmware_version    = self.builder.get_object( UI_FIRMWARE_VERSION )
+        self.ui_error_win             = self.builder.get_object( UI_ERROR_WIN )
+        self.ui_main_win              = self.builder.get_object( UI_MAIN_WIN )
+        self.ui_status_bar            = self.builder.get_object( UI_STATUS_BAR )
+        self.ui_midi_channel_switches = self.builder.get_object( UI_MIDI_CHANNEL_SWITCHES )
+        self.ui_midi_channel          = self.builder.get_object( UI_MIDI_CHANNEL )
+        self.ui_key_priority          = self.builder.get_object( UI_KEY_PRIORITY )
+        self.ui_midi_in_transpose     = self.builder.get_object( UI_MIDI_IN_TRANSPOSE )
+        self.ui_midi_multitrigger     = self.builder.get_object( UI_MIDI_MULTI_TRIGGER )
+        self.ui_firmware_version      = self.builder.get_object( UI_FIRMWARE_VERSION )
 
         self.builder.connect_signals( self )
 
@@ -120,13 +120,18 @@ class SynthWasp():
     def showParameters( self, data ):
         self.fromApp = True
 
-        self.ui_midi_channel_switch.set_active( data[0] )
+        self.ui_midi_channel_switches.set_active( data[0] )
         self.ui_midi_channel.set_value( data[1] + 1 )
         self.ui_key_priority.set_active( data[3] )
         self.ui_midi_in_transpose.set_value( data[2]  - 12 )
         self.ui_midi_multitrigger.set_active( data[4] )
 
         self.ui_midi_channel.set_sensitive( data[0] == 1 )
+
+        if( self.ui_midi_channel_switches.get_active() == 0 ):
+            self.ui_midi_channel.set_sensitive( False )
+        else:
+            self.ui_midi_channel.set_sensitive( True )
 
         self.fromApp = False
 
