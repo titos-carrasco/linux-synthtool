@@ -877,6 +877,7 @@
                         <property name="numeric">True</property>
                         <property name="update-policy">if-valid</property>
                         <property name="value">1</property>
+                        <signal name="value-changed" handler="onSeqLengthChanged" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -945,6 +946,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="margin-start">10</property>
+                        <signal name="clicked" handler="onSeqRecallClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -973,6 +975,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="margin-start">40</property>
+                        <signal name="clicked" handler="onClearClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1093,7 +1096,7 @@
                                 <property name="alignment">0.5</property>
                                 <child>
                                   <object class="GtkCellRendererToggle">
-                                    <signal name="toggled" handler="onGlideToggled" swapped="no"/>
+                                    <signal name="toggled" handler="onSlideToggled" swapped="no"/>
                                   </object>
                                   <attributes>
                                     <attribute name="active">4</attribute>

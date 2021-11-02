@@ -28,17 +28,16 @@ UI_NOTES_TREE         = "MainWin/Sequencer/Notes"
 UI_NOTES_STORE        = "ListStore MainWin/Sequencer/Notes"
 UI_FIRMWARE_VERSION   = "MainWin/Update/Firmware Version"
 
-UI_SEQ_BANK         = "MainWin/Sequencer/Bank"
-UI_SEQ_PATTERN      = "MainWin/Sequencer/Pattern"
-UI_SEQ_CLEAR        = "MainWin/Sequencer/Clear"
-UI_SEQ_RECALL       = "MainWin/Sequencer/Recall"
-UI_SEQ_STORE        = "MainWin/Sequencer/Store"
-UI_SEQ_LENGTH       = "MainWin/Sequencer/Length"
-UI_SEQ_SWING        = "MainWin/Sequencer/Swing"
+UI_SEQ_PATTERN_GROUP   = "MainWin/Sequencer/Pattern Group"
+UI_SEQ_PATTERN_SECTION = "MainWin/Sequencer/Pattern Section"
+UI_SEQ_PATTERN         = "MainWin/Sequencer/Pattern"
+UI_SEQ_LENGTH          = "MainWin/Sequencer/Length"
+UI_SEQ_TRIPLET         = "MainWin/Sequencer/Triplet"
+UI_SEQ_RECALL          = "MainWin/Sequencer/Recall"
+UI_SEQ_STORE           = "MainWin/Sequencer/Store"
+UI_SEQ_CLEAR           = "MainWin/Sequencer/Clear"
 
-GATES = [ "12.5%", "25.0%", "37.5%", "50.0%", "62.5%", "75.0%", "87.5%", "100%" ]
 NOTES = [ "C","C#","D","D#","E","F","F#","G","G#","A","A#","B" ]
-
 
 class SynthTD3():
 
@@ -68,10 +67,14 @@ class SynthTD3():
         self.ui_notes_store        = self.builder.get_object( UI_NOTES_STORE )
         self.ui_firmware_version   = self.builder.get_object( UI_FIRMWARE_VERSION )
 
-        self.ui_seq_bank    = self.builder.get_object( UI_SEQ_BANK )
-        self.ui_seq_pattern = self.builder.get_object( UI_SEQ_BANK )
-        self.ui_seq_length  = self.builder.get_object( UI_SEQ_LENGTH )
-        self.ui_seq_swing   = self.builder.get_object( UI_SEQ_SWING )
+        self.ui_seq_pattern_group   = self.builder.get_object( UI_SEQ_PATTERN_GROUP )
+        self.ui_seq_pattern_section = self.builder.get_object( UI_SEQ_PATTERN_SECTION )
+        self.ui_seq_pattern         = self.builder.get_object( UI_SEQ_PATTERN )
+        self.ui_seq_length          = self.builder.get_object( UI_SEQ_LENGTH )
+        self.ui_seq_triplet         = self.builder.get_object( UI_SEQ_TRIPLET )
+        self.ui_seq_recall          = self.builder.get_object( UI_SEQ_RECALL )
+        self.ui_seq_store           = self.builder.get_object( UI_SEQ_STORE )
+        self.ui_seq_clear           = self.builder.get_object( UI_SEQ_CLEAR )
 
         self.builder.connect_signals( self )
 
@@ -109,7 +112,7 @@ class SynthTD3():
 
     def sendSysEx( self, data ):
         sysex = [ 0xF0 ] + MANUF_ID + DEVICE_ID + data + [ 0xF7 ]
-        print( "SEND:", bytes( sysex ).hex().upper() )
+        #print( "SEND:", bytes( sysex ).hex().upper() )
 
         self.waiting = True
         self.midiOut.send_message( sysex )
@@ -128,7 +131,7 @@ class SynthTD3():
         if( len( resp ) == 0 ): return
         if( end != 0xF7 ): return
 
-        print( "RECV:", resp.hex().upper() )
+        #print( "RECV:", resp.hex().upper() )
 
         # firmware version
         if( resp[0:2] == bytes( [ 0x09, 0x00 ] ) ):
@@ -140,8 +143,8 @@ class SynthTD3():
             GLib.idle_add( self.showParameters, resp[1:] )
 
         # a pattern
-        #elif( resp[0] == 0x78 ):
-        #    GLib.idle_add( self.showSequencer, resp[1:] )
+        elif( resp[0] == 0x78 ):
+            GLib.idle_add( self.showSequencer, resp[1:] )
 
         self.waiting = False
 
@@ -219,7 +222,7 @@ class SynthTD3():
     def onMultiTriggerChanged( self, widget ):
         if( self.fromApp ): return
         multitrigger = int( widget.get_active() )
-        data = [ 0x14, multitrigger ]
+        data = [ 0x14, multitrigger, 0x00 ]
         self.sendSysEx( data )
 
     def onClockSourceChanged( self, widget ):
@@ -259,20 +262,23 @@ class SynthTD3():
     def onClearClicked( self, widget ):
         self.ui_notes_store.clear()
 
-        # num, rest, note, octave, gate, ratchet, velocitym glide, accent
-        self.ui_notes_store.append( [ 1, False, "C", 3, "50.0%", 1, 64, False, False ] )
+        # num, rest, note, octave, slide, accent
+        self.ui_notes_store.append( [ 1, False, "C", 3, False, False ] )
 
         self.fromApp = True
         self.ui_seq_length.set_value( 1 )
-        self.ui_seq_swing.set_value( 50 )
+        self.ui_seq_triplet.set_active( 0 )
         self.fromApp = False
 
     def onSeqRecallClicked( self, widget ):
-        bank = int( self.ui_seq_bank.get_active() )
+        patt_grp = int( self.ui_seq_pattern_group.get_active() )
+        patt_sec = int( self.ui_seq_pattern_section.get_active() )
         patt = int( self.ui_seq_pattern.get_active() )
-        self.sendSysEx( [ 0x77, bank, patt ] )
+        self.sendSysEx( [ 0x77, patt_grp, patt_sec << 4 | patt ] )
 
     def onStoreClicked( self, widget ):
+        return
+        """
         bank  = int( self.ui_seq_bank.get_active() )
         patt  = int( self.ui_seq_pattern.get_active() )
         steps = int( self.ui_seq_length.get_value() ) - 1
@@ -317,6 +323,7 @@ class SynthTD3():
             data = data + [ 0X0F, 0X0F, 0X0F, 0X0F, 0X0F, 0X0F, 0X0F, 0X0F ]
 
         self.sendSysEx( [ 0x78 ] + data )
+        """
 
     def onSeqLengthChanged( self, widget ):
         if( self.fromApp ): return
@@ -327,7 +334,7 @@ class SynthTD3():
         if( l > n ):
             l = l - n
             for i in range( l ):
-                self.ui_notes_store.append( [ n+i+1, False, "C", 3, "50.0%", 1, 64, False, False ] )
+                self.ui_notes_store.append( [ n+i+1, False, "C", 3, False, False ] )
         elif( l < n ):
             elems = []
             for i in range( l, n ):
@@ -341,69 +348,54 @@ class SynthTD3():
     def onNotedEdited( self, cell, path, tree_iter ):
         note = tree_iter
         octave = self.ui_notes_store[path][3]
-        if( note != "C" and octave == 9 ):
+        if( note != "C" and octave == 4 ):
             note = "C"
         self.ui_notes_store[path][2] = note
 
     def onOctaveEdited( self, cell, path, tree_iter ):
         octave = int( tree_iter )
         note = self.ui_notes_store[path][2]
-        if( note != "C" and octave == 9 ):
-            octave = 8
+        if( note != "C" and octave == 4 ):
+            octave = 3
         self.ui_notes_store[path][3] = octave
 
-    def onGateEdited( self, cell, path, tree_iter ):
-        self.ui_notes_store[path][4] = tree_iter
-
-    def onRatchetEdited( self, cell, path, tree_iter ):
-        self.ui_notes_store[path][5] = int( tree_iter )
-
-    def onVelocityEdited( self, cell, path, tree_iter ):
-        try:
-            v = int( tree_iter )
-        except:
-            v = 64
-        v = 0 if v < 0 else v
-        v= 127 if v > 127 else v
-        self.ui_notes_store[path][6] = v
-
-    def onGlideToggled( self, cell, path ):
-        self.ui_notes_store[path][7]= not self.ui_notes_store[path][7]
+    def onSlideToggled( self, cell, path ):
+        self.ui_notes_store[path][4]= not self.ui_notes_store[path][4]
 
     def onAccentToggled( self, cell, path ):
-        self.ui_notes_store[path][8]= not self.ui_notes_store[path][8]
+        self.ui_notes_store[path][5]= not self.ui_notes_store[path][5]
 
     def showSequencer( self, data ):
         self.fromApp = True
 
-        bank   = int( data[0] ) + 1
-        patt   = int( data[1] ) + 1
+        patt_grp = int( data[0] )
+        patt_sec = int( data[1] ) >> 3
+        patt     = int( data[1] ) & 0x07
+        notes    = data[4:36]
+        accents  = data[36:68]
+        slides   = data[68:100]
+        triplet  = int( data[101] )
+        nsteps   = int( data[102] )*16 + int( data[103] )
 
-        swing  = data[2:4]
-        if( swing[0] == 0 ): swing = 50 + int( swing[1] )
-        else: swing = 66 + int( swing[1] )
-        nsteps = int( data[5] )*8 + int( data[7] ) + 1
+        self.ui_seq_pattern_group.set_active( patt_grp )
+        self.ui_seq_pattern_section.set_active( patt_sec )
+        self.ui_seq_pattern.set_active( patt )
+        self.ui_seq_length.set_value( nsteps  )
+        self.ui_seq_triplet.set_active( triplet )
 
-        self.ui_seq_swing.set_value( swing )
-        self.ui_seq_length.set_value( nsteps )
-
-        steps  = data[8:]
         self.ui_notes_store.clear()
         for i in range(nsteps):
-            step = steps[0:8]
-            n = step[0:2]
-            n = int( n[1] ) + int( n[0] )*16 + 1
-            octave = int( n/12 ) - 1
+            n = int( notes[1] ) + int( notes[0] )*16 + 1
+            octave = int( n/12 )
             note = NOTES[ n%12 - 1]
-            gate = GATES[ int(step[2]) ]
-            ratchet = int( step[3] ) + 1
-            velocity = int( step[5] ) + int( step[4] )*16
-            glide  = 1 if( step[6] & 0x01 != 0 ) else 0
-            accent = 1 if( step[6] & 0x04 != 0 ) else 0
-            rest   = 1 if( step[6] & 0x08 != 0 ) else 0
-            unk      = step[7]
-            self.ui_notes_store.append( [ i + 1, rest, note, octave, gate, ratchet, velocity, glide, accent ] )
-            steps = steps[8:]
+            rest   = 0 #1 if( step[6] & 0x08 != 0 ) else 0
+            accent = accents[1]
+            slide  = slides[1]
+            self.ui_notes_store.append( [ i + 1, rest, note, octave, slide, accent ] )
+
+            notes   = notes[2:]
+            accents = accents[2:]
+            slides  = slides[2:]
 
         self.fromApp = False
 

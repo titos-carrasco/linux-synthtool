@@ -11,40 +11,40 @@ RECV: F0 00 20 32 00 01 05 76 aa bb cc dd ee ff gg hh ii F7 : aa=pitch bend, bb=
 SEND: F0 00 20 32 00 01 05 7D F7                            : Restore Factory Settings
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 11 aa 00 F7                      : Pitch Bend Semitones aa=0-12
+SEND: F0 00 20 32 00 01 05 11 aa 00 F7                      : Pitch Bend Semitones aa=0x00-0x0C
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 1B aa F7                         : Clock Source aa= 0 (internal) - 4 (auto)
+SEND: F0 00 20 32 00 01 05 1B aa F7                         : Clock Source aa= 0x00 (internal) - 0x04 (auto)
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 1A aa F7                         : if Clock Source == TRIG: Clock Rate aa = 0 (1 PPS ) - 4 (CV)
+SEND: F0 00 20 32 00 01 05 1A aa F7                         : if Clock Source == TRIG: Clock Rate aa = 0x00 (1 PPS ) - 0x04 (CV)
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 19 aa F7                         : if Clock Rate != CV: Clock Polarity aa = 0 (Fall) 1 (Raise)
+SEND: F0 00 20 32 00 01 05 19 aa F7                         : if Clock Rate != CV: Clock Polarity aa = 0x00 (Fall) 0x01 (Raise)
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 17 aa F7                         : Midi Clock Out aa = 0 (Deactivated) 1 (Activated)
+SEND: F0 00 20 32 00 01 05 17 aa F7                         : Midi Clock Out aa = 0x00 (Deactivated) 0x01 (Activated)
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 1F aa F7                         : Assign Value aa= 0 (Accent) - 15 (MIDI CC7)
+SEND: F0 00 20 32 00 01 05 1F aa F7                         : Assign Value aa= 0x00 (Accent) - 0x0F (MIDI CC7)
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 1D aa F7                         : Sequencer auto sync aa = 0 (Deactivated) 1 (Activated)
+SEND: F0 00 20 32 00 01 05 1D aa F7                         : Sequencer auto sync aa = 0x00 (Deactivated) 0x01 (Activated)
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 1C aa F7                         : Accent Velocity Threshold aa = 0 - 127
+SEND: F0 00 20 32 00 01 05 1C aa F7                         : Accent Velocity Threshold aa = 0x00 - 0x7F
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 
-SEND: F0 00 20 32 00 01 05 77 aa bb F7                      : Recall Pattern aa = bank (0-7) bb = pattern (0-8)
+SEND: F0 00 20 32 00 01 05 77 aa bb F7                      : Recall Pattern aa = bank (0x00-0x07) bb = pattern (0x0-0x8)
 RECV:
 F0                                                          : sysex start
 00 20 32                                                    : behringer
 00 01 05                                                    : crave
 78                                                          : patterns stored
-aa bb                                                       : aa=bank bb=patterb
-00 00 00 00 00 00
-03 00 03 00 04 00 00 00 03 00 03 00 04 00 00 0F             : pattern 1 = 8 bytes - pattern 2 = 8 bytes
-03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F             : pattern 3 = 8 bytes - pattern 4 = 8 bytes
+aa bb                                                       : aa=bank bb=pattern
+cc dd 00 ee 00 ff                                           : swing= if cc==0 then 50 + dd else: 66 + dd, nsteps=ee*8 + ff + 1
+03 00 03 00 04 00 00 00 03 00 03 00 04 00 00 0F             : step 1 = 8 bytes - step 2 = 8 bytes
+03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F             : step 3 = 8 bytes - step 4 = 8 bytes
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F
@@ -58,7 +58,7 @@ aa bb                                                       : aa=bank bb=patterb
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F
-03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F             : pattern 31 = 8 bytes - pattern 32 = 8 bytes
+03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F             : step 31 = 8 bytes - step 32 = 8 bytes
 F7                                                          : sysex end
 
 
@@ -68,7 +68,8 @@ F0                                                          : sysex start
 00 01 05                                                    : crave
 78                                                          : store patterns
 01 00 00 00 00 00 00 00
-03 00 03 00 04 00 00 00 0F 0F 0F 0F 0F 0F 0F 0F             : pattern 1 = 8 bytes - pattern 2 = 8 bytes
+03 00 03 00 04 00 00 00 0F 0F 0F 0F 0F 0F 0F 0F             : step 1 = 8 bytes - step 2 = 8 bytes
+0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F             : empty step = 0F 0F 0F 0F 0F 0F 0F 0F
 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F
 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F
 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F
@@ -82,9 +83,16 @@ F0                                                          : sysex start
 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F
 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F
 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F
-0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F
-0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F             : pattern 31 = 8 bytes - pattern 32 = 8 bytes
+0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F 0F             : step 31 = 8 bytes - step 32 = 8 bytes
 F7                                                          : sysex end
 
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
+-------------------------------------------------
+STEP
+aa bb                                                       : n=aa*16+bb; octave=n/12-1; note=n%12-1
+cc                                                          : gate
+dd                                                          : ratchet
+ee ff                                                       : velocity=ee*16 + ff
+gg                                                          : glide=gg & 0x01; accent=gg & 0x04; rest=gg & 0x08
+hh                                                          : ??
 

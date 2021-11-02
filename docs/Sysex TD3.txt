@@ -12,7 +12,7 @@ RECV: F0 00 20 32 00 01 0A 76 aa bb cc dd ee ff gg hh ii jj F7  : aa=midi out, b
 SEND: F0 00 20 32 00 01 0A 7D F7                                : Restore Factory Settings
 RECV: no answer
 
-SEND: F0 00 20 32 00 01 0A 0E 01 aa bb F7                       : midi channel aa=0x00-0x0F (out) bb=in
+SEND: F0 00 20 32 00 01 0A 0E 01 aa bb F7                       : set midi channel: aa=0x00-0x0F (midi out) bb=0x00-0x0F (midi in)
 RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
 
 SEND: F0 00 20 32 00 01 0A 11 aa 00 F7                          : pitch bend semitones aa=0x00-0x0C
@@ -41,10 +41,31 @@ RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
 
 SEND: F0 00 20 32 00 01 0A 1C aa F7                             : accent velocity th aa=0x00 - 0x7F
 RECV: F0 00 20 32 00 01 0A 01 00 00 F7                          : OK?
+------------------------
+
+SEND: F0 00 20 32 00 01 0A 77 aa bc F7                          : recall pattern aa=pattern group, b=pattern section, c=pattern
+RECV:
+F0
+00 20 32                                                        : behringer
+00 01 0A                                                        : TD3
+78                                                              : the pattern
+aa bb                                                           : aa=pattern group, pattern section=(bb & 0x08 ? B : A), pattern=bb & 0x07
+00 00                                                           : ??
+aa bb aa bb aa bb aa bb aa bb aa bb aa bb aa bb                 : nota=aa*16+bb -  C1=12, C#1=13, D1=14 ...
+aa bb aa bb aa bb aa bb aa bb aa bb aa bb aa bb
+
+00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa                 : accent aa=0x01
+00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa
+
+00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa                 : slide aa=0x01
+00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa 00 aa
+
+00 aa                                                           : triplet aa=0x00 disabled - 0x01 enabled
+aa bb                                                           : nsteps = aa*16+bb
+0a 0b 0c 0d 0e                                                  : 1 bit por paso = 2**nsteps-1 = 0xbadc
+0a 0b 0c 0d 0e                                                  : 1 bit por paso = 2**nsteps-1 = 0xbadc  bit on=>REST
+F7
+------------------------
 
 SEND:
 RECV:
-
-SEND:
-RECV:
-
