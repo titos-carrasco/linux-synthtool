@@ -136,6 +136,8 @@
       <column type="gboolean"/>
       <!-- column-name Accent -->
       <column type="gboolean"/>
+      <!-- column-name Editable -->
+      <column type="gboolean"/>
     </columns>
     <data>
       <row>
@@ -148,6 +150,7 @@
         <col id="6">64</col>
         <col id="7">False</col>
         <col id="8">False</col>
+        <col id="9">True</col>
       </row>
     </data>
   </object>
@@ -992,6 +995,7 @@
                                     <signal name="edited" handler="onNotedEdited" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">2</attribute>
                                   </attributes>
                                 </child>
@@ -1012,6 +1016,7 @@
                                     <signal name="edited" handler="onOctaveEdited" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">3</attribute>
                                   </attributes>
                                 </child>
@@ -1033,6 +1038,7 @@
                                     <signal name="edited" handler="onGateEdited" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">4</attribute>
                                   </attributes>
                                 </child>
@@ -1054,6 +1060,7 @@
                                     <signal name="edited" handler="onRatchetEdited" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">5</attribute>
                                   </attributes>
                                 </child>
@@ -1074,6 +1081,7 @@
                                     <signal name="edited" handler="onVelocityEdited" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="text">6</attribute>
                                   </attributes>
                                 </child>
@@ -1090,6 +1098,7 @@
                                     <signal name="toggled" handler="onGlideToggled" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="active">7</attribute>
                                   </attributes>
                                 </child>
@@ -1106,6 +1115,7 @@
                                     <signal name="toggled" handler="onAccentToggled" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">9</attribute>
                                     <attribute name="active">8</attribute>
                                   </attributes>
                                 </child>

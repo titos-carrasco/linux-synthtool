@@ -240,7 +240,7 @@ class SynthCrave():
         self.ui_notes_store.clear()
 
         # num, rest, note, octave, gate, ratchet, velocitym glide, accent
-        self.ui_notes_store.append( [ 1, False, "C", 3, "50.0%", 1, 64, False, False ] )
+        self.ui_notes_store.append( [ 1, False, "C", 3, "50.0%", 1, 64, False, False, True ] )
 
         self.fromApp = True
         self.ui_seq_length.set_value( 1 )
@@ -256,13 +256,13 @@ class SynthCrave():
         bank  = int( self.ui_seq_bank.get_active() )
         patt  = int( self.ui_seq_pattern.get_active() )
         steps = int( self.ui_seq_length.get_value() ) - 1
-        swing = int( self.ui_seq_swing.get_value() )
+        swing = int( self.ui_seq_swing.get_value() ) - 50
 
         data = [0]*8
         data[0] = bank
         data[1] = patt
-        data[2] = 0 if swing< 66 else 1
-        data[3] = swing-50 if swing < 66 else swing - 66
+        data[2] = swing>>4
+        data[3] = swing & 0x0F
         data[4] = 0
         data[5] = steps >> 3
         data[6] = 0
@@ -307,7 +307,7 @@ class SynthCrave():
         if( l > n ):
             l = l - n
             for i in range( l ):
-                self.ui_notes_store.append( [ n+i+1, False, "C", 3, "50.0%", 1, 64, False, False ] )
+                self.ui_notes_store.append( [ n+i+1, False, "C", 3, "50.0%", 1, 64, False, False, True ] )
         elif( l < n ):
             elems = []
             for i in range( l, n ):
@@ -316,7 +316,9 @@ class SynthCrave():
                 self.ui_notes_store.remove( e )
 
     def onRestToggled( self, cell, path ):
-        self.ui_notes_store[path][1]= not self.ui_notes_store[path][1]
+        rest = not self.ui_notes_store[path][1]
+        self.ui_notes_store[path][1]= rest
+        self.ui_notes_store[path][9]= not rest
 
     def onNotedEdited( self, cell, path, tree_iter ):
         note = tree_iter
@@ -356,13 +358,11 @@ class SynthCrave():
     def showSequencer( self, data ):
         self.fromApp = True
 
+        #print( data.hex().upper() )
         bank   = int( data[0] ) + 1
         patt   = int( data[1] ) + 1
-
-        swing  = data[2:4]
-        if( swing[0] == 0 ): swing = 50 + int( swing[1] )
-        else: swing = 66 + int( swing[1] )
-        nsteps = int( data[5] )*8 + int( data[7] ) + 1
+        swing  = 50 + ( int( data[2] )<<4 ) + int( data[3] )
+        nsteps = 1  + ( int( data[5] )<<3 ) + int( data[7] )
 
         self.ui_seq_swing.set_value( swing )
         self.ui_seq_length.set_value( nsteps )
@@ -372,17 +372,17 @@ class SynthCrave():
         for i in range(nsteps):
             step = steps[0:8]
             n = step[0:2]
-            n = int( n[1] ) + int( n[0] )*16 + 1
+            n = ( int( n[0] )<<4 ) + int( n[1] )
             octave = int( n/12 ) - 1
-            note = NOTES[ n%12 - 1]
+            note = NOTES[ n%12]
             gate = GATES[ int(step[2]) ]
             ratchet = int( step[3] ) + 1
-            velocity = int( step[5] ) + int( step[4] )*16
+            velocity = ( int( step[4] )<<4 ) + int( step[5] )
             glide  = 1 if( step[6] & 0x01 != 0 ) else 0
             accent = 1 if( step[6] & 0x04 != 0 ) else 0
             rest   = 1 if( step[6] & 0x08 != 0 ) else 0
             unk      = step[7]
-            self.ui_notes_store.append( [ i + 1, rest, note, octave, gate, ratchet, velocity, glide, accent ] )
+            self.ui_notes_store.append( [ i + 1, rest, note, octave, gate, ratchet, velocity, glide, accent, not rest ] )
             steps = steps[8:]
 
         self.fromApp = False

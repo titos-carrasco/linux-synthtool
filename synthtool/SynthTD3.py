@@ -32,6 +32,8 @@ UI_SEQ_PATTERN_GROUP   = "MainWin/Sequencer/Pattern Group"
 UI_SEQ_PATTERN_SECTION = "MainWin/Sequencer/Pattern Section"
 UI_SEQ_PATTERN         = "MainWin/Sequencer/Pattern"
 UI_SEQ_LENGTH          = "MainWin/Sequencer/Length"
+UI_SEQ_LENGTH_ADJ      = "Adjustment MainWin/Sequencer/Length"
+UI_SEQ_LENGTH_TEXT     = "MainWin/Sequencer/Length text"
 UI_SEQ_TRIPLET         = "MainWin/Sequencer/Triplet"
 UI_SEQ_RECALL          = "MainWin/Sequencer/Recall"
 UI_SEQ_STORE           = "MainWin/Sequencer/Store"
@@ -71,6 +73,8 @@ class SynthTD3():
         self.ui_seq_pattern_section = self.builder.get_object( UI_SEQ_PATTERN_SECTION )
         self.ui_seq_pattern         = self.builder.get_object( UI_SEQ_PATTERN )
         self.ui_seq_length          = self.builder.get_object( UI_SEQ_LENGTH )
+        self.ui_seq_length_adj      = self.builder.get_object( UI_SEQ_LENGTH_ADJ )
+        self.ui_seq_length_text     = self.builder.get_object( UI_SEQ_LENGTH_TEXT )
         self.ui_seq_triplet         = self.builder.get_object( UI_SEQ_TRIPLET )
         self.ui_seq_recall          = self.builder.get_object( UI_SEQ_RECALL )
         self.ui_seq_store           = self.builder.get_object( UI_SEQ_STORE )
@@ -263,7 +267,7 @@ class SynthTD3():
         self.ui_notes_store.clear()
 
         # num, rest, note, octave, slide, accent
-        self.ui_notes_store.append( [ 1, False, "C", 3, False, False ] )
+        self.ui_notes_store.append( [ 1, False, "C", 2, False, False, True ] )
 
         self.fromApp = True
         self.ui_seq_length.set_value( 1 )
@@ -274,56 +278,53 @@ class SynthTD3():
         patt_grp = int( self.ui_seq_pattern_group.get_active() )
         patt_sec = int( self.ui_seq_pattern_section.get_active() )
         patt = int( self.ui_seq_pattern.get_active() )
-        self.sendSysEx( [ 0x77, patt_grp, patt_sec << 4 | patt ] )
+        self.sendSysEx( [ 0x77, patt_grp, patt_sec << 3 | patt ] )
 
     def onStoreClicked( self, widget ):
+        patt_grp = int( self.ui_seq_pattern_group.get_active() )
+        patt_sec = int( self.ui_seq_pattern_section.get_active() )
+        patt = int( self.ui_seq_pattern.get_active() )
+        data = [ patt_grp, patt_sec << 4 | patt, 0x00, 0x00 ]
+
+        notes   = []
+        accents = []
+        slides  = []
+
+        nsteps  = len( self.ui_notes_store )
+        mask_1 = 0x0000
+        mask_2 = 0x0000
+        i = 0
+        while( i < 16 ):
+            if( i < nsteps ):
+                row = self.ui_notes_store[i][1:6]
+                rest = row[0]
+                note = row[1]
+                octave = row[2]
+                slide = row[3]
+                accent = row[4]
+
+                if( octave == 4 ):
+                    n = 0xB0
+                else:
+                    n = octave*12 + NOTES.index( note )
+                notes = notes + [ n>>4 , n & 0x0F ]
+                accents = accents + [ 0x00, accent ]
+                slides  = slides + [ 0x00, slide ]
+                if( rest ):
+                    mask_2 = mask_2 | ( 1 << i )
+            else:
+                notes   = notes + [ 0x01, 0x08 ]
+                accents = accents + [ 0x00, 0x00 ]
+                slides  = slides + [ 0x00, 0x00 ]
+            i = i + 1
+
+        data = data + notes + accents + slides + [ 0x00, self.ui_seq_triplet.get_active(), (nsteps>>4) & 0x0F, nsteps & 0x0F, 0x00, 0x00 ]
+        data = data + [ (mask_1 & 0x00F0)>>4, mask_1 & 0x000F, (mask_1 & 0xF000)>>12, (mask_1 & 0x0F00)>>8 ]
+        data = data + [ (mask_2 & 0x00F0)>>4, mask_2 & 0x000F, (mask_2 & 0xF000)>>12, (mask_2 & 0x0F00)>>8 ]
+        print( bytes(data).hex().upper() )
         return
-        """
-        bank  = int( self.ui_seq_bank.get_active() )
-        patt  = int( self.ui_seq_pattern.get_active() )
-        steps = int( self.ui_seq_length.get_value() ) - 1
-        swing = int( self.ui_seq_swing.get_value() )
-
-        data = [0]*8
-        data[0] = bank
-        data[1] = patt
-        data[2] = 0 if swing< 66 else 1
-        data[3] = swing-50 if swing < 66 else swing - 66
-        data[4] = 0
-        data[5] = steps >> 3
-        data[6] = 0
-        data[7] = steps & 0x07
-
-        n = len( self.ui_notes_store )
-        for i in range( n ):
-            elem     = self.ui_notes_store[i].iter
-            rest     = int( self.ui_notes_store[elem][1] )
-            note     = NOTES.index( self.ui_notes_store[elem][2] )
-            octave   = int( self.ui_notes_store[elem][3] )
-            gate     = GATES.index( self.ui_notes_store[elem][4] )
-            ratchet  = int( self.ui_notes_store[elem][5] ) - 1
-            velocity = int( self.ui_notes_store[elem][6] )
-            glide    = int( self.ui_notes_store[elem][7] )
-            accent   = int( self.ui_notes_store[elem][8] )
-
-            note = note + (octave+1)*12
-            row = [0]*8
-            row[0] = note >> 4
-            row[1] = note & 0x0F
-            row[2] = gate
-            row[3] = ratchet
-            row[4] = velocity >> 4
-            row[5] = velocity & 0x0F
-            row[6] = rest*0x08 + accent*0x04 + glide*0x01
-            row[7] = 0
-
-            data = data + row
-
-        for i in range( n, 32 ):
-            data = data + [ 0X0F, 0X0F, 0X0F, 0X0F, 0X0F, 0X0F, 0X0F, 0X0F ]
 
         self.sendSysEx( [ 0x78 ] + data )
-        """
 
     def onSeqLengthChanged( self, widget ):
         if( self.fromApp ): return
@@ -334,7 +335,7 @@ class SynthTD3():
         if( l > n ):
             l = l - n
             for i in range( l ):
-                self.ui_notes_store.append( [ n+i+1, False, "C", 3, False, False ] )
+                self.ui_notes_store.append( [ n+i+1, False, "C", 2, False, False, True ] )
         elif( l < n ):
             elems = []
             for i in range( l, n ):
@@ -342,8 +343,25 @@ class SynthTD3():
             for e in elems:
                 self.ui_notes_store.remove( e )
 
+    def onTripletChanged( self, widget ):
+        if( self.fromApp ): return
+        triplet = widget.get_active()
+        if( triplet ):
+            self.ui_seq_length_text.set_text( "[1, 15]" )
+            self.ui_seq_length_adj.set_upper( 15 )
+            n = len( self.ui_notes_store )
+            if( n == 16 ):
+                self.ui_seq_length.set_value( 15 )
+        else:
+            self.ui_seq_length_text.set_text( "[1, 16]" )
+            self.ui_seq_length_adj.set_upper( 16 )
+
     def onRestToggled( self, cell, path ):
-        self.ui_notes_store[path][1]= not self.ui_notes_store[path][1]
+        rest = not self.ui_notes_store[path][1]
+        self.ui_notes_store[path][1]= rest
+
+        # la fila no es editables si es un silencio
+        self.ui_notes_store[path][6] = not rest
 
     def onNotedEdited( self, cell, path, tree_iter ):
         note = tree_iter
@@ -366,10 +384,10 @@ class SynthTD3():
         self.ui_notes_store[path][5]= not self.ui_notes_store[path][5]
 
     def showSequencer( self, data ):
+        print( data.hex().upper() )
         self.fromApp = True
-
         patt_grp = int( data[0] )
-        patt_sec = int( data[1] ) >> 3
+        patt_sec = 0 if int( data[1] ) & 0x08 == 0 else 1
         patt     = int( data[1] ) & 0x07
         notes    = data[4:36]
         accents  = data[36:68]
@@ -377,25 +395,45 @@ class SynthTD3():
         triplet  = int( data[101] )
         nsteps   = int( data[102] )*16 + int( data[103] )
 
+        mask   = data[106:110]
+        mask_1 = ( mask[2]&0x0F )<< 12 | ( mask[3]&0x0F )<<8 | ( mask[0]&0x0F )<<4 | ( mask[1]&0x0F )
+        mask   = data[110:114]
+        mask_2 = ( mask[2]&0x0F )<< 12 | ( mask[3]&0x0F )<<8 | ( mask[0]&0x0F )<<4 | ( mask[1]&0x0F )
+
         self.ui_seq_pattern_group.set_active( patt_grp )
         self.ui_seq_pattern_section.set_active( patt_sec )
         self.ui_seq_pattern.set_active( patt )
         self.ui_seq_length.set_value( nsteps  )
         self.ui_seq_triplet.set_active( triplet )
+        if( triplet ):
+            self.ui_seq_length_text.set_text( "[1, 15]" )
+            self.ui_seq_length_adj.set_upper( 15 )
+        else:
+            self.ui_seq_length_text.set_text( "[1, 16]" )
+            self.ui_seq_length_adj.set_upper( 16 )
 
         self.ui_notes_store.clear()
         for i in range(nsteps):
-            n = int( notes[1] ) + int( notes[0] )*16 + 1
-            octave = int( n/12 )
-            note = NOTES[ n%12 - 1]
-            rest   = 0 #1 if( step[6] & 0x08 != 0 ) else 0
-            accent = accents[1]
-            slide  = slides[1]
-            self.ui_notes_store.append( [ i + 1, rest, note, octave, slide, accent ] )
+            n = int( notes[0] )<<4 | int( notes[1] )&0x0F
+            if( n <= 0x2F ):
+                octave = int( n/12 )
+                note = NOTES[ n%12]
+            else:
+                octave = 4
+                note ="C"
+            rest   = mask_2 & 0x01
+            accent = accents[1] if rest == 0 else 0
+            slide  = slides[1]  if rest == 0 else 0
+            self.ui_notes_store.append( [ i + 1, rest, note, octave, slide, accent, not rest ] )
 
-            notes   = notes[2:]
-            accents = accents[2:]
-            slides  = slides[2:]
+            if( rest == 0 ):
+                notes   = notes[2:]
+                accents = accents[2:]
+                slides  = slides[2:]
+            else:
+                pass
+
+            mask_2 = mask_2 >> 1
 
         self.fromApp = False
 

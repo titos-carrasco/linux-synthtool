@@ -96,15 +96,18 @@
       <column type="gboolean"/>
       <!-- column-name Accent -->
       <column type="gboolean"/>
+      <!-- column-name Editable -->
+      <column type="gboolean"/>
     </columns>
     <data>
       <row>
         <col id="0">1</col>
         <col id="1">False</col>
         <col id="2">C</col>
-        <col id="3">3</col>
+        <col id="3">2</col>
         <col id="4">False</col>
         <col id="5">False</col>
+        <col id="6">True</col>
       </row>
     </data>
   </object>
@@ -886,7 +889,7 @@
                       </packing>
                     </child>
                     <child>
-                      <object class="GtkLabel">
+                      <object class="GtkLabel" id="MainWin/Sequencer/Length text">
                         <property name="visible">True</property>
                         <property name="can-focus">False</property>
                         <property name="margin-start">5</property>
@@ -921,6 +924,7 @@
                           <item translatable="yes">Disable</item>
                           <item translatable="yes">Enable</item>
                         </items>
+                        <signal name="changed" handler="onTripletChanged" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -961,6 +965,7 @@
                         <property name="can-focus">True</property>
                         <property name="receives-default">True</property>
                         <property name="margin-start">10</property>
+                        <signal name="clicked" handler="onStoreClicked" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
@@ -1018,7 +1023,6 @@
                               <object class="GtkTreeViewColumn" id="Col: #">
                                 <property name="sizing">fixed</property>
                                 <property name="title" translatable="yes">#</property>
-                                <property name="expand">True</property>
                                 <property name="alignment">0.5</property>
                                 <child>
                                   <object class="GtkCellRendererText">
@@ -1062,6 +1066,7 @@
                                     <signal name="edited" handler="onNotedEdited" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">6</attribute>
                                     <attribute name="text">2</attribute>
                                   </attributes>
                                 </child>
@@ -1083,6 +1088,7 @@
                                     <signal name="edited" handler="onOctaveEdited" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">6</attribute>
                                     <attribute name="text">3</attribute>
                                   </attributes>
                                 </child>
@@ -1099,6 +1105,7 @@
                                     <signal name="toggled" handler="onSlideToggled" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">6</attribute>
                                     <attribute name="active">4</attribute>
                                   </attributes>
                                 </child>
@@ -1115,6 +1122,7 @@
                                     <signal name="toggled" handler="onAccentToggled" swapped="no"/>
                                   </object>
                                   <attributes>
+                                    <attribute name="visible">6</attribute>
                                     <attribute name="active">5</attribute>
                                   </attributes>
                                 </child>

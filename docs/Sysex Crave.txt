@@ -41,8 +41,9 @@ F0                                                          : sysex start
 00 20 32                                                    : behringer
 00 01 05                                                    : crave
 78                                                          : patterns stored
-aa bb                                                       : aa=bank bb=pattern
-cc dd 00 ee 00 ff                                           : swing= if cc==0 then 50 + dd else: 66 + dd, nsteps=ee*8 + ff + 1
+0a 0b                                                       : a=bank b=pattern
+0a 0b                                                       : swing=0xab
+00 0a 00 0b                                                 : nsteps=e<<3 + b + 1
 03 00 03 00 04 00 00 00 03 00 03 00 04 00 00 0F             : step 1 = 8 bytes - step 2 = 8 bytes
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F             : step 3 = 8 bytes - step 4 = 8 bytes
 03 00 03 00 04 00 00 0F 03 00 03 00 04 00 00 0F
@@ -89,10 +90,10 @@ F7                                                          : sysex end
 RECV: F0 00 20 32 00 01 05 01 00 00 F7                      : OK?
 -------------------------------------------------
 STEP
-aa bb                                                       : n=aa*16+bb; octave=n/12-1; note=n%12-1
-cc                                                          : gate
-dd                                                          : ratchet
-ee ff                                                       : velocity=ee*16 + ff
-gg                                                          : glide=gg & 0x01; accent=gg & 0x04; rest=gg & 0x08
-hh                                                          : ??
+0a 0b                                                       : n=0xab; octave=n/12-1; note=n%12-1
+0c                                                          : gate
+0d                                                          : ratchet
+0e 0f                                                       : velocity=0xef
+0g                                                          : glide=gg & 0x01; accent=gg & 0x04; rest=gg & 0x08
+0h                                                          : ??
 
