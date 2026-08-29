@@ -1,6 +1,7 @@
 from SynthCrave import SynthCrave
 from SynthWasp import SynthWasp
 from SynthTD3 import SynthTD3
+from SynthTD3MO import SynthTD3MO
 
 import gi
 gi.require_version("Gtk", "3.0")
@@ -9,12 +10,14 @@ from gi.repository import Gtk,GLib
 MAIN_WIN_UI = "resources/SynthTool.glade"
 CRAVE_UI    = "resources/SynthCrave.glade"
 WASP_UI     = "resources/SynthWasp.glade"
-TD3_UI     = "resources/SynthTD3.glade"
+TD3_UI      = "resources/SynthTD3.glade"
+TD3MO_UI    = "resources/SynthTD3MO.glade"
 
 MAIN_WIN = "Main Window"
 CRAVE    = "Crave"
 WASP     = "Wasp"
 TD3      = "TD-3"
+TD3MO    = "TD-3-MO"
 PRO1     = "PRO-1"
 
 class SynthTool():
@@ -51,6 +54,8 @@ def main():
         SynthWasp( WASP_UI ).run()
     elif( name == TD3 ):
         SynthTD3( TD3_UI ).run()
+    elif( name == TD3MO ):
+        SynthTD3MO( TD3MO_UI ).run()
 
 # Show Time
 main()
