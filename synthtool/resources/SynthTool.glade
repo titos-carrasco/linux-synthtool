@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkImage" id="Crave.png">
@@ -16,6 +16,11 @@
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="pixbuf">TD-3.png</property>
+  </object>
+  <object class="GtkImage" id="TD3MO.png">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">TD-3-MO.png</property>
   </object>
   <object class="GtkImage" id="Wasp.png">
     <property name="visible">True</property>
@@ -37,12 +42,13 @@
         <property name="orientation">vertical</property>
         <property name="spacing">20</property>
         <child>
-          <!-- n-columns=2 n-rows=2 -->
+          <!-- n-columns=2 n-rows=3 -->
           <object class="GtkGrid">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="row-spacing">10</property>
             <property name="column-spacing">10</property>
+            <property name="row-homogeneous">True</property>
             <property name="column-homogeneous">True</property>
             <child>
               <object class="GtkButton" id="Crave">
@@ -91,6 +97,21 @@
               </packing>
             </child>
             <child>
+              <object class="GtkButton" id="TD-3-MO">
+                <property name="label" translatable="yes">TD-3-MO</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="image">TD3MO.png</property>
+                <property name="image-position">bottom</property>
+                <signal name="clicked" handler="onButtonlicked" swapped="no"/>
+              </object>
+              <packing>
+                <property name="left-attach">0</property>
+                <property name="top-attach">2</property>
+              </packing>
+            </child>
+            <child>
               <object class="GtkButton" id="PRO-1">
                 <property name="label" translatable="yes">PRO-1</property>
                 <property name="visible">True</property>
@@ -104,6 +125,9 @@
                 <property name="left-attach">1</property>
                 <property name="top-attach">1</property>
               </packing>
+            </child>
+            <child>
+              <placeholder/>
             </child>
           </object>
           <packing>
